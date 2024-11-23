@@ -1,4 +1,4 @@
-### Game Idea
+### Game Idea v1
 
 得分权值：？
 
