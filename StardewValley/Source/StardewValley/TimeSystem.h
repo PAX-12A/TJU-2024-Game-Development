@@ -32,7 +32,7 @@ private:
 		Autumn,
 		Winter
 	};
-	const int kDaysInSeason = 30;
+	const int kDaysInSeason = 31;
 	const int kHoursInDay = 24;
 	const int kMinutesInHour = 60;
 	const int kSeasonsNum = 4;
