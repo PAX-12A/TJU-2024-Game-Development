@@ -1,10 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*****************************************************************
+ * \file   EventSystem.h
+ * \brief  The EventSystem. Use for communication between different parts.
+ * 
+ * \author 4_of_Diamonds
+ * \date   November 2024
+ *********************************************************************/
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "EventSystem.generated.h"
+
+DECLARE_MULTICAST_DELEGATE(FMulticastDelegate);
 
 /**
  * 
@@ -13,5 +21,15 @@ UCLASS()
 class STARDEWVALLEY_API UEventSystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-	
+public:
+	FMulticastDelegate OnEarlyMorningBegin;
+	FMulticastDelegate OnMorningBegin;
+	FMulticastDelegate OnNoonBegin;
+	FMulticastDelegate OnAfternoonBegin;
+	FMulticastDelegate OnEveningBegin;
+	FMulticastDelegate OnNightBegin;
+	FMulticastDelegate OnSpringBegin;
+	FMulticastDelegate OnSummerBegin;
+	FMulticastDelegate OnAutumnBegin;
+	FMulticastDelegate OnWinterBegin;
 };
