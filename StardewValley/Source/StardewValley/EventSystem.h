@@ -32,4 +32,8 @@ public:
 	FMulticastDelegate OnSummerBegin;
 	FMulticastDelegate OnAutumnBegin;
 	FMulticastDelegate OnWinterBegin;
+	FMulticastDelegate OnEightInMorning;//For weather to change
+	FMulticastDelegate OnEightInEvening;//For weather to change
+
+	FMulticastDelegate OnWeatherChanged;
 };

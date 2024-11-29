@@ -8,15 +8,24 @@
 
 #include "TimeSystem.h"
 #include "EventSystem.h"
+#include "DataSystem.h"
 #include <stdexcept>
 
+UTimeSystem::UTimeSystem()
+{
+	minute_ = 0;
+	hour_ = 0;
+	day_in_season_ = 1;
+	season_ = Season::Spring;
+	time_flow_speed_ = 1.0f;
+}
 void UTimeSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	FTimerDelegate timer_delegate;
 	timer_delegate.BindUObject(this, &UTimeSystem::TimeFlow);
-	GetGameInstance()->GetWorld()->GetTimerManager().SetTimer(timer_handle_, timer_delegate, 1.0f, true);
-
+	GetGameInstance()->GetWorld()->GetTimerManager().SetTimer(timer_handle_, timer_delegate, time_flow_speed_, true);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_season(static_cast<int32>(season_));
 }
 
 void UTimeSystem::Deinitialize()
@@ -94,25 +103,43 @@ void UTimeSystem::TimeFlow()
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnNightBegin.Broadcast();
 	}
 
+	//data system update and broadcast
 	if (season_ == Season::Spring && day_in_season_ == 1 && hour_ == 0 && minute_ == 0)
 	{
 		if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.IsBound())
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.Broadcast();
+		GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_season(static_cast<int32>(season_));
 	}
 	else if (season_ == Season::Summer && day_in_season_ == 1 && hour_ == 0 && minute_ == 0)
 	{
 		if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnSummerBegin.IsBound())
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnSummerBegin.Broadcast();
+		GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_season(static_cast<int32>(season_));
 	}
 	else if (season_ == Season::Autumn && day_in_season_ == 1 && hour_ == 0 && minute_ == 0)
 	{
 		if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnAutumnBegin.IsBound())
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnAutumnBegin.Broadcast();
+		GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_season(static_cast<int32>(season_));
 	}
 	else if (season_ == Season::Winter && day_in_season_ == 1 && hour_ == 0 && minute_ == 0)
 	{
 		if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.IsBound())
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.Broadcast();
+		GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_season(static_cast<int32>(season_));
 	}
+
+	//broadcast
+	if (hour_ == 8 && minute_ == 0)
+	{
+		if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInMorning.IsBound())
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInMorning.Broadcast();
+	}
+	else if (hour_ == 20 && minute_ == 0)
+	{
+		if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInEvening.IsBound())
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInEvening.Broadcast();
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Time now is Season: %d, Day: %d, Hour: %d, minute: %d"), static_cast<int>(get_season()), get_day_in_season(), get_hour(), get_minute());
 }
