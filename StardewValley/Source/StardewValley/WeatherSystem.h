@@ -39,4 +39,11 @@ public:
 	 * \brief Update the base temperature.
 	 */
 	void UpdateBaseTemperature();
+
+public:
+	//Getters
+	int32 get_weather() { return static_cast<int32>(weather_); };
+
+	//Setters
+	void set_weather(int32 weather) { weather_ = static_cast<Weather>(weather); };
 };

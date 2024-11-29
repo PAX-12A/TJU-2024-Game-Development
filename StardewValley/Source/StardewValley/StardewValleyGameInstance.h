@@ -13,5 +13,7 @@ UCLASS()
 class STARDEWVALLEY_API UStardewValleyGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+public:
+	virtual void Init() override;
 
 };
