@@ -17,7 +17,7 @@ UTimeSystem::UTimeSystem()
 	hour_ = 0;
 	day_in_season_ = 1;
 	season_ = Season::Spring;
-	time_flow_speed_ = 1.0f;
+	time_flow_speed_ = 0.01f;
 }
 void UTimeSystem::Initialize(FSubsystemCollectionBase& Collection)
 {

@@ -36,4 +36,5 @@ public:
 	FMulticastDelegate OnEightInEvening;//For weather to change
 
 	FMulticastDelegate OnWeatherChanged;
+	FMulticastDelegate OnBaseTemperatureChanged;
 };
