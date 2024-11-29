@@ -43,10 +43,14 @@ private:
 	int32 minute_;
 
 	FTimerHandle timer_handle_;
+
+	UPROPERTY(VisibleAnywhere)
+	float time_flow_speed_;
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 public:
+	UTimeSystem();
 	// Getters
 	Season get_season() { return season_; }
 	int get_day_in_season() { return day_in_season_; }
