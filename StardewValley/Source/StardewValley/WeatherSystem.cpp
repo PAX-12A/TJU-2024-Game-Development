@@ -1,7 +1,7 @@
 /*****************************************************************//**
  * \file   WeatherSystem.cpp
  * \brief  The implementation of the weather system
- * 
+ *
  * \author 4_of_Diamonds
  * \date   November 2024
  *********************************************************************/
@@ -19,6 +19,12 @@ void UWeatherSystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInMorning.AddUObject(this, &UWeatherSystem::ChangeWeather);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInEvening.AddUObject(this, &UWeatherSystem::ChangeWeather);
+
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWeatherChanged.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSummerBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnAutumnBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
 }
 
 void UWeatherSystem::Deinitialize()
@@ -69,4 +75,50 @@ void UWeatherSystem::ChangeWeather()
 		GetGameInstance()->GetSubsystem<UEventSystem>()->OnWeatherChanged.Broadcast();//broadcast
 
 	UE_LOG(LogTemp, Warning, TEXT("Weather changed to %d"), static_cast<int32>(weather_));
+}
+
+void UWeatherSystem::UpdateBaseTemperature()
+{
+	int32 current_season = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_season();
+	int32 current_weather = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_weather();
+
+	int32 base_temperature;
+	switch (current_season)
+	{
+	case 0:
+		base_temperature = 16;
+		break;
+	case 1:
+		base_temperature = 26;
+		break;
+	case 2:
+		base_temperature = 11;
+		break;
+	case 3:
+		base_temperature = 4;
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("WeatherSystem.cpp: UpdateBaseTemperature: Invalid season"));
+	}
+	switch (current_weather)
+	{
+	case 0:
+		base_temperature += 5;
+		break;
+	case 1:
+		break;
+	case 2:
+		base_temperature -= 5;
+		break;
+	case 3:
+		base_temperature -= 10;
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("WeatherSystem.cpp: UpdateBaseTemperature: Invalid weather"));
+	}
+
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_base_temperature(base_temperature);//datasystem update
+	if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnBaseTemperatureChanged.IsBound())
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnBaseTemperatureChanged.Broadcast();//broadcast
+	UE_LOG(LogTemp, Warning, TEXT("Base temperature updated to %d"), base_temperature);
 }

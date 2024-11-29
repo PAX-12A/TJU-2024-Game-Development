@@ -31,5 +31,12 @@ private:
 public:
 	void Initialize(FSubsystemCollectionBase& Collection) override;
 	void Deinitialize() override;
+	/**
+	 * \brief Change the weather.
+	 */
 	void ChangeWeather();
+	/**
+	 * \brief Update the base temperature.
+	 */
+	void UpdateBaseTemperature();
 };
