@@ -25,7 +25,6 @@ void UTimeSystem::Initialize(FSubsystemCollectionBase& Collection)
 	FTimerDelegate timer_delegate;
 	timer_delegate.BindUObject(this, &UTimeSystem::TimeFlow);
 	GetGameInstance()->GetWorld()->GetTimerManager().SetTimer(timer_handle_, timer_delegate, time_flow_speed_, true);
-	GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_season(static_cast<int32>(season_));
 }
 
 void UTimeSystem::Deinitialize()
@@ -70,6 +69,9 @@ void UTimeSystem::TimeFlow()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Called"));
 	Flow(1);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_minute(minute_);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_hour(hour_);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_day_in_season(day_in_season_);
 
 	//Broadcast events on key times
 	if (minute_ == 0 && hour_ == 2)
