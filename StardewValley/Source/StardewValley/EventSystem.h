@@ -34,6 +34,10 @@ public:
 	FMulticastDelegate OnWinterBegin;
 	FMulticastDelegate OnEightInMorning;//For weather to change
 	FMulticastDelegate OnEightInEvening;//For weather to change
+	FMulticastDelegate OnHourChanged;
+	FMulticastDelegate OnDayChanged;
+	FMulticastDelegate OnSeasonChanged;
+	FMulticastDelegate OnMinuteChanged;
 
 	FMulticastDelegate OnWeatherChanged;
 	FMulticastDelegate OnBaseTemperatureChanged;
