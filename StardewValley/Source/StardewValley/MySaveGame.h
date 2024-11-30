@@ -31,4 +31,14 @@ public:
 	int32 weather_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	int32 base_temperature_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 ground_block_x_length_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 ground_block_y_length_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<FString> ground_block_type_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<int32> ground_block_delta_temperature_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 ground_block_size_;
 };

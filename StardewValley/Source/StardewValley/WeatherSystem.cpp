@@ -72,7 +72,7 @@ void UWeatherSystem::ChangeWeather()
 	if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnWeatherChanged.IsBound())
 		GetGameInstance()->GetSubsystem<UEventSystem>()->OnWeatherChanged.Broadcast();//broadcast
 
-	UE_LOG(LogTemp, Warning, TEXT("Weather changed to %d"), static_cast<int32>(weather_));
+	//UE_LOG(LogTemp, Warning, TEXT("Weather changed to %d"), static_cast<int32>(weather_));
 }
 
 void UWeatherSystem::UpdateBaseTemperature()
@@ -161,5 +161,5 @@ void UWeatherSystem::UpdateBaseTemperature()
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_base_temperature(base_temperature);//datasystem update
 	if (GetGameInstance()->GetSubsystem<UEventSystem>()->OnBaseTemperatureChanged.IsBound())
 		GetGameInstance()->GetSubsystem<UEventSystem>()->OnBaseTemperatureChanged.Broadcast();//broadcast
-	UE_LOG(LogTemp, Warning, TEXT("Base temperature updated to %d"), base_temperature);
+	//UE_LOG(LogTemp, Warning, TEXT("Base temperature updated to %d"), base_temperature);
 }

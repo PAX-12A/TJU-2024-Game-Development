@@ -41,4 +41,6 @@ public:
 
 	FMulticastDelegate OnWeatherChanged;
 	FMulticastDelegate OnBaseTemperatureChanged;
+
+	FMulticastDelegate OnGroundGenerated;
 };

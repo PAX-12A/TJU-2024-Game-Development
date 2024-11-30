@@ -159,5 +159,5 @@ void UTimeSystem::TimeFlow()
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInEvening.Broadcast();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Time now is Season: %d, Day: %d, Hour: %d, minute: %d"), static_cast<int>(get_season()), get_day_in_season(), get_hour(), get_minute());
+	//UE_LOG(LogTemp, Warning, TEXT("Time now is Season: %d, Day: %d, Hour: %d, minute: %d"), static_cast<int>(get_season()), get_day_in_season(), get_hour(), get_minute());
 }
