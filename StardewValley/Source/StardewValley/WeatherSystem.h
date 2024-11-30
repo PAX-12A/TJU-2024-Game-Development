@@ -32,11 +32,11 @@ public:
 	void Initialize(FSubsystemCollectionBase& Collection) override;
 	void Deinitialize() override;
 	/**
-	 * \brief Change the weather.
+	 * \brief Change the weather, called on 8am and 8pm.
 	 */
 	void ChangeWeather();
 	/**
-	 * \brief Update the base temperature.
+	 * \brief Update the base temperature, called when the hour changes.
 	 */
 	void UpdateBaseTemperature();
 

@@ -17,14 +17,12 @@ void UWeatherSystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 	srand(time(nullptr));
 
+	//Weather change
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInMorning.AddUObject(this, &UWeatherSystem::ChangeWeather);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEightInEvening.AddUObject(this, &UWeatherSystem::ChangeWeather);
 
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWeatherChanged.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSummerBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnAutumnBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
+	//Temperature change
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnHourChanged.AddUObject(this, &UWeatherSystem::UpdateBaseTemperature);
 }
 
 void UWeatherSystem::Deinitialize()
@@ -81,6 +79,7 @@ void UWeatherSystem::UpdateBaseTemperature()
 {
 	int32 current_season = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_season();
 	int32 current_weather = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_weather();
+	int32 current_hour = GetGameInstance()->GetSubsystem<UDataSystem>()->get_hour();
 
 	int32 base_temperature;
 	switch (current_season)
@@ -115,6 +114,48 @@ void UWeatherSystem::UpdateBaseTemperature()
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("WeatherSystem.cpp: UpdateBaseTemperature: Invalid weather"));
+	}
+
+	switch (current_hour)
+	{
+	case 0:
+	case 1:
+	case 2:
+		base_temperature -= 5;
+		break;
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+		base_temperature -= 3;
+		break;
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+		base_temperature -= 1;
+		break;
+	case 11:
+	case 12:
+	case 13:
+	case 14:
+		base_temperature += 3;
+		break;
+	case 15:
+	case 16:
+	case 17:
+	case 18:
+		base_temperature += 1;
+		break;
+	case 19:
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+		base_temperature -= 2;
+		break;
+	default:
+		break;
 	}
 
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_present_base_temperature(base_temperature);//datasystem update
