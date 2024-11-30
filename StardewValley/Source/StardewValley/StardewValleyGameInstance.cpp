@@ -10,6 +10,7 @@
 #include "DataSystem.h"
 #include "TimeSystem.h"
 #include "WeatherSystem.h"
+#include "SceneManager.h"
 
 void UStardewValleyGameInstance::Init()
 {
@@ -18,6 +19,7 @@ void UStardewValleyGameInstance::Init()
 	UTimeSystem* TimeSystem = GetSubsystem<UTimeSystem>();
 	UDataSystem* DataSystem = GetSubsystem<UDataSystem>();
 	UWeatherSystem* WeatherSystem = GetSubsystem<UWeatherSystem>();
+	USceneManager* SceneManager = GetSubsystem<USceneManager>();
 
 	TimeSystem->set_minute(DataSystem->get_minute());
 	TimeSystem->set_hour(DataSystem->get_hour());
