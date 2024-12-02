@@ -11,6 +11,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GroundBlockBase.h"
+#include "ItemBlockBase.h"
 #include "DataSystem.generated.h"
 
 /**
@@ -29,6 +30,11 @@ private:
 	TArray<AGroundBlockBase*> ground_blocks_;
 	TArray<FString> ground_block_type_;
 	TArray<int32> ground_block_delta_temperature_;
+private:
+	//Item block data
+	TArray<AItemBlockBase*> item_blocks_;
+	TArray<FString> item_block_type_;
+	bool is_items_initialized_;
 private:
 	//Time data
 	int32 present_season_;
@@ -58,7 +64,13 @@ public:
 	int32 get_ground_block_delta_temperature(int32 x, int32 y) { if(x * ground_block_y_length_ + y < ground_block_delta_temperature_.Num() && x * ground_block_y_length_ + y >= 0)return ground_block_delta_temperature_[x * ground_block_y_length_ + y];else return 0; };
 	AGroundBlockBase* get_ground_block(int32 index) { if (index < ground_blocks_.Num() && index >= 0)return ground_blocks_[index]; else return nullptr; };
 	AGroundBlockBase* get_ground_block(int32 x, int32 y) { if (x * ground_block_y_length_ + y < ground_blocks_.Num() && x * ground_block_y_length_ + y >= 0)return ground_blocks_[x * ground_block_y_length_ + y]; else return nullptr; };
-
+public:
+	//Item block data getters
+	AItemBlockBase* get_item_block(int32 index) { if (index < item_blocks_.Num() && index >= 0)return item_blocks_[index]; else return nullptr; };
+	AItemBlockBase* get_item_block(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_blocks_.Num() && x * ground_block_y_length_ + y >= 0)return item_blocks_[x * ground_block_y_length_ + y]; else return nullptr; };
+	FString get_item_block_type(int32 index) { if (index < item_block_type_.Num() && index >= 0)return item_block_type_[index]; else return ""; };
+	FString get_item_block_type(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_type_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_type_[x * ground_block_y_length_ + y]; else return ""; };
+	bool is_items_initialized() { return is_items_initialized_; };
 public:
 	//Weather data getters
 	int32 get_present_weather() { return present_weather_; };
@@ -86,6 +98,13 @@ public:
 	void set_ground_block_delta_temperature(int32 x, int32 y, int32 delta_temperature) { set_ground_block_delta_temperature(x * ground_block_y_length_ + y, delta_temperature); };
 	void set_ground_block(int32 index, AGroundBlockBase* block) { while (ground_blocks_.Num() <= index) { ground_blocks_.Add(nullptr); }; ground_blocks_[index] = block; };
 	void set_ground_block(int32 x, int32 y, AGroundBlockBase* block) { set_ground_block(x * ground_block_y_length_ + y, block); };
+public:
+	//Item block data setters
+	void set_item_block(int32 index, AItemBlockBase* block) { while (item_blocks_.Num() <= index) { item_blocks_.Add(nullptr); }; item_blocks_[index] = block; };
+	void set_item_block(int32 x, int32 y, AItemBlockBase* block) { set_item_block(x * ground_block_y_length_ + y, block); };
+	void set_item_block_type(int32 index, FString type) { while (item_block_type_.Num() <= index) { item_block_type_.Add(""); }; item_block_type_[index] = type; };
+	void set_item_block_type(int32 x, int32 y, FString type) { set_item_block_type(x * ground_block_y_length_ + y, type); };
+	void set_is_items_initialized(bool is_initialized) { is_items_initialized_ = is_initialized; };
 
 	/*-----------------------------Others-----------------------------*/
 public:

@@ -16,11 +16,14 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+    TypeToSizeMap.Add("item_block_tree", { 2, 2 });
+
     UWorld* World = GetWorld();
     if (World)
     {
         World->GetTimerManager().SetTimer(timer_handler_, this, &USceneManager::GenerateMap, 2.0f, false);//Delay the generation of the map, otherwise the world may not be ready, and the map will not be generated
     }
+    GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundGenerated.AddUObject(this, &USceneManager::GenerateItems);
 }
 
 void USceneManager::Deinitialize()
@@ -236,4 +239,107 @@ void USceneManager::CreateGroundBlockByLocation(float x, float y, FString type)
     //Update data system
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(x_index, y_index, type);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(x_index, y_index, 0);
+}
+
+void USceneManager::CreateItemBlockByLocation(float x, float y, FString type)
+{
+    UClass* item_class = nullptr;
+    item_class = TypeToClass(type);
+    if (item_class == nullptr)
+    {
+        return;
+    }
+
+    int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+    int32 x_index = static_cast<int32>(x / block_size);
+    int32 y_index = static_cast<int32>(y / block_size);
+    int32 x_length = kMaxLength;
+    int32 y_length = kMaxLength;
+
+    if (x < 0 || y < 0 || x_index + TypeToSizeMap[type].x_length - 1 >= x_length || y_index + TypeToSizeMap[type].y_length - 1 >= y_length)
+    {
+		throw std::out_of_range("Out of range");
+    }
+    
+    if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(x_index, y_index) != nullptr)//There is already an item block
+	{
+		//DestroyItemBlockByLocation(x, y);
+        return;
+	}
+
+	// Create the item block
+	FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
+	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
+	AActor* ItemInstance = nullptr;
+	UWorld* World = GetWorld();
+    if (World == nullptr) return;
+    item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_tree.BP_item_block_tree_C"));
+	ItemInstance = World->SpawnActor<AActor>(item_class, SpawnLocation + FVector(x_index * block_size, y_index * block_size, 0.0f), SpawnRotation);
+
+    //Update data system
+	for (int i = x_index; i < x_index + TypeToSizeMap[type].x_length; i++)
+        for (int j = y_index; j < y_index + TypeToSizeMap[type].y_length; j++)
+        {
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_type(i, j, type);
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block(i, j, Cast<AItemBlockBase>(ItemInstance));
+        }
+}
+void USceneManager::DestroyItemBlockByLocation(float x, float y)
+{
+    int32 index_x, index_y;
+    try
+    {
+        GetIndexOfTheGroundBlockByLocation(x, y, index_x, index_y);
+    }
+    catch (const std::out_of_range& e)
+    {
+
+        UE_LOG(LogTemp, Error, TEXT("SceneManager.cpp: DestroyGroundBlockByLocation: %s"), *FString(e.what()));
+        return;
+    }
+
+    //Update data system
+    AItemBlockBase* item_block = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(index_x, index_y);
+    if (item_block == nullptr)return;
+    for (int i = 0; i < kMaxLength; i++)
+        for (int j = 0; j < kMaxLength; j++)
+		{
+			if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(i, j) == item_block)
+			{ 
+                GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_type(i, j, "");
+				GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block(i, j, nullptr);
+			}
+		}
+
+    //Destroy
+    bool is_destroyed = item_block->Destroy();
+}
+void USceneManager::GenerateItems()
+{
+    int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+    if (GetGameInstance()->GetSubsystem<UDataSystem>()->is_items_initialized())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Items are already initialized"));
+        for (int i =0; i < kMaxLength; i++)
+            for (int j = 0; j < kMaxLength; j++)
+            {
+                CreateItemBlockByLocation(i * block_size, j * block_size, GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_type(i, j));
+            }
+    }
+    else
+    {
+        for (int i = 55; i < 60; i++)
+            for (int j = 55; j < 60; j++)
+            {
+                CreateItemBlockByLocation(i * block_size, j * block_size, "item_block_tree");
+            }
+        GetGameInstance()->GetSubsystem<UDataSystem>()->set_is_items_initialized(true);
+    }
+    //DestroyItemBlockByLocation(55 * block_size, 55 * block_size);
+}
+UClass* USceneManager::TypeToClass(FString type)
+{
+	UClass* item_class = nullptr;
+	if (type == "item_block_tree") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_tree.BP_item_block_tree_C"));
+	return item_class;
 }

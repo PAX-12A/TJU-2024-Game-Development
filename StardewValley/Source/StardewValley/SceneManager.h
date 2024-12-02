@@ -22,6 +22,7 @@ class STARDEWVALLEY_API USceneManager : public UGameInstanceSubsystem
 public:
 	void Initialize(FSubsystemCollectionBase& Collection) override;
 	void Deinitialize() override;
+	//Ground Blocks
 	UFUNCTION()
 	/**
 	 * \brief Generate the Ground blocks.
@@ -73,9 +74,35 @@ public:
 	 * \param type the type of the ground block
 	 */
 	void CreateGroundBlockByLocation(float x, float y, FString type);
+
+	//Item Blocks
+	/**
+	 * \brief Create the item block of the given class at the given location.
+	 * 
+	 * \param x The x location of the item block
+	 * \param y The y location of the item block
+	 * \param item_class The class of the item block to create
+	 */
+	void CreateItemBlockByLocation(float x, float y, FString type);
+	/**
+	 * \brief Destroy the item block at the given location.
+	 * 
+	 * \param x The x location of the item block
+	 * \param y The y location of the item block
+	 */
+	void DestroyItemBlockByLocation(float x, float y);
+	/**
+	 * \brief Generate the items.
+	 * 
+	 */
+	void GenerateItems();
+	UClass* TypeToClass(FString type);
+	struct item_size { int32 x_length; int32 y_length; };
+	TMap<FString, item_size> TypeToSizeMap;
 private:
 	FTimerHandle timer_handler_;
 	const int kMaxLength = 128;
 	const int kDefaultBlockSize = 40;
+	const int kHeight = 5;
 };
 

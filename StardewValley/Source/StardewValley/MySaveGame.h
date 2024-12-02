@@ -41,4 +41,8 @@ public:
 	TArray<int32> ground_block_delta_temperature_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	int32 ground_block_size_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<FString> item_block_type_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	bool is_items_initialized_;
 };
