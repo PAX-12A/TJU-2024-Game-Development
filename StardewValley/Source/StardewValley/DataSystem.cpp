@@ -34,6 +34,11 @@ void UDataSystem::Initialize(FSubsystemCollectionBase& Collection)
 			set_ground_block_type(i, LoadedGame->ground_block_type_[i]);
 			set_ground_block_delta_temperature(i, LoadedGame->ground_block_delta_temperature_[i]);
 		}
+		set_is_items_initialized(LoadedGame->is_items_initialized_);
+		for (int i = 0; i < LoadedGame->item_block_type_.Num(); i++)// Item block data loaded
+		{
+			set_item_block_type(i, LoadedGame->item_block_type_[i]);
+		}
     }
 }
 
@@ -61,6 +66,11 @@ void UDataSystem::Deinitialize()
 			SaveGameInstance->ground_block_type_.Add(ground_block_type_[i]);
 			SaveGameInstance->ground_block_delta_temperature_.Add(ground_block_delta_temperature_[i]);
         }
+		SaveGameInstance->is_items_initialized_ = is_items_initialized_;
+		for (int i = 0; i < item_block_type_.Num(); i++)//Item block data saved
+		{
+			SaveGameInstance->item_block_type_.Add(item_block_type_[i]);
+		}
 
         // Save the data to a file
         bool bSuccess = UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("SavedGame"), 0);
