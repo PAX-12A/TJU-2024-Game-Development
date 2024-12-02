@@ -63,7 +63,19 @@ public:
 	 * \param y The y location of the ground block
 	 */
 	void DestroyGroundBlockByLocation(float x, float y);
+	/**
+	 * \brief Create the ground block of the given type at the given location.
+	 * \brief The ground block will be destroyed if it already exists.
+	 * \brief The ground block must be within the 128x128 grid.
+	 * 
+	 * \param x the x location of the ground block
+	 * \param y the y location of the ground block
+	 * \param type the type of the ground block
+	 */
+	void CreateGroundBlockByLocation(float x, float y, FString type);
 private:
 	FTimerHandle timer_handler_;
+	const int kMaxLength = 128;
+	const int kDefaultBlockSize = 40;
 };
 
