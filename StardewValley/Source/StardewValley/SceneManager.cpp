@@ -63,9 +63,9 @@ void USceneManager::GenerateMap()
         //If there is no ground block, create the initial map.
         if (x_length == 0 || y_length == 0 || block_size == 0)
         {
-            x_length = 128;
-            y_length = 128;
-            block_size = 40;
+            x_length = kMaxLength;
+            y_length = kMaxLength;
+            block_size = kDefaultBlockSize;
             GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_x_length(x_length);
             GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_y_length(y_length);
             GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_size(block_size);
@@ -126,8 +126,6 @@ void USceneManager::GenerateMap()
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to load BP_GrassGround class!"));
     }
-    UE_LOG(LogTemp, Warning, TEXT("Address: %p"), GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block(0, 0));
-    DestroyGroundBlockByLocation(20, 13);
 }
 
 FString USceneManager::GetGroundBlockTypeByLocation(float x, float y)
@@ -191,6 +189,51 @@ void USceneManager::DestroyGroundBlockByLocation(float x, float y)
     GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(index_x, index_y, 0);
     if(GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block(index_x, index_y) == nullptr)return;
     bool is_destroyed = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block(index_x, index_y)->Destroy();
-    UE_LOG(LogTemp, Warning, TEXT("SceneManager.cpp: DestroyGroundBlockByLocation: %s"), *FString(is_destroyed ? "Destroyed" : "Failed to destroy"));
     GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block(index_x, index_y, nullptr);
+}
+void USceneManager::CreateGroundBlockByLocation(float x, float y, FString type)
+{
+    int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+    int32 x_index = static_cast<int32>(x / block_size);
+    int32 y_index = static_cast<int32>(y / block_size);
+    int32 x_length = kMaxLength;
+    int32 y_length = kMaxLength;
+
+    if (x < 0 || y < 0 || x_index >= x_length || y_index >= y_length)
+    {
+        throw std::out_of_range("Out of range");
+    }
+
+    if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block(x_index, y_index) != nullptr)//There is already a ground block
+    {
+        DestroyGroundBlockByLocation(x, y);
+    }
+
+    // Load the blueprint class
+    UClass* GrassGroundClass = LoadObject<UClass>(nullptr, TEXT("/Game/GroundBlock/BP_GrassGround.BP_GrassGround_C"));
+    UClass* EarthGroundClass = LoadObject<UClass>(nullptr, TEXT("/Game/GroundBlock/BP_EarthGround.BP_EarthGround_C"));
+    UClass* FieldGroundClass = LoadObject<UClass>(nullptr, TEXT("/Game/GroundBlock/BP_FieldGround.BP_FieldGround_C"));
+    UClass* SnowGroundClass = LoadObject<UClass>(nullptr, TEXT("/Game/GroundBlock/BP_SnowGround.BP_SnowGround_C"));
+    UClass* WaterGroundClass = LoadObject<UClass>(nullptr, TEXT("/Game/GroundBlock/BP_WaterGround.BP_WaterGround_C"));
+    TArray<UClass*> GroundClasses = { GrassGroundClass, EarthGroundClass, FieldGroundClass, SnowGroundClass, WaterGroundClass };
+    
+    // For each type of ground block
+    int type_index = 0;
+    if (type == "GrassGround")type_index = 0;
+    else if (type == "EarthGround")type_index = 1;
+    else if (type == "FieldGround")type_index = 2;
+    else if (type == "SnowGround")type_index = 3;
+    else if (type == "WaterGround")type_index = 4;
+
+    // Create the ground block
+    FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
+    FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
+    AActor* GroundInstance = nullptr;
+    UWorld* World = GetWorld();
+    GroundInstance = World->SpawnActor<AActor>(GroundClasses[type_index], SpawnLocation + FVector(x_index * block_size, y_index * block_size, 0.0f), SpawnRotation);
+    GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block(x_index, y_index, Cast<AGroundBlockBase>(GroundInstance));
+
+    //Update data system
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(x_index, y_index, type);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(x_index, y_index, 0);
 }
