@@ -74,6 +74,16 @@ public:
 	 * \param type the type of the ground block
 	 */
 	void CreateGroundBlockByLocation(float x, float y, FString type);
+	/**
+	 * \brief Change all the earth ground to snow ground. Called when winter starts.
+	 * 
+	 */
+	void ChangeEarthGroundToSnowGround();
+	/**
+	 * \brief Change all the snow ground to earth ground. Called when spring starts.
+	 * 
+	 */
+	void ChangeSnowGroundToEarthGround();
 
 	//Item Blocks
 	/**
@@ -103,6 +113,6 @@ private:
 	FTimerHandle timer_handler_;
 	const int kMaxLength = 128;
 	const int kDefaultBlockSize = 40;
-	const int kHeight = 5;
+	const int kHeight = 0;
 };
 

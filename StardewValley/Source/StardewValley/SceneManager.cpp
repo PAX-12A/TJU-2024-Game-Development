@@ -17,6 +17,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 
     TypeToSizeMap.Add("item_block_tree", { 2, 2 });
+    TypeToSizeMap.Add("item_block_transparent_wall", { 1, 1 });
 
     UWorld* World = GetWorld();
     if (World)
@@ -24,6 +25,9 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
         World->GetTimerManager().SetTimer(timer_handler_, this, &USceneManager::GenerateMap, 2.0f, false);//Delay the generation of the map, otherwise the world may not be ready, and the map will not be generated
     }
     GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundGenerated.AddUObject(this, &USceneManager::GenerateItems);
+    GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &USceneManager::ChangeEarthGroundToSnowGround);
+    GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &USceneManager::ChangeSnowGroundToEarthGround);
+
 }
 
 void USceneManager::Deinitialize()
@@ -131,6 +135,7 @@ void USceneManager::GenerateMap()
     }
 }
 
+/*----------------------------------------------Ground Block-------------------------------------*/
 FString USceneManager::GetGroundBlockTypeByLocation(float x, float y)
 {
     int32 index_x, index_y;
@@ -240,7 +245,36 @@ void USceneManager::CreateGroundBlockByLocation(float x, float y, FString type)
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(x_index, y_index, type);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(x_index, y_index, 0);
 }
+void USceneManager::ChangeEarthGroundToSnowGround()
+{
+    int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
+	int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
+    int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+	for (int i = 0; i < x_length; i++)
+		for (int j = 0; j < y_length; j++)
+		{
+			if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(i, j) == "EarthGround")
+			{
+				CreateGroundBlockByLocation(i * block_size, j * block_size, "SnowGround");
+			}
+		}
+}
+void USceneManager::ChangeSnowGroundToEarthGround()
+{
+	int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
+	int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
+	int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+	for (int i = 0; i < x_length; i++)
+		for (int j = 0; j < y_length; j++)
+		{
+			if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(i, j) == "SnowGround")
+			{
+				CreateGroundBlockByLocation(i * block_size, j * block_size, "EarthGround");
+			}
+		}
+}
 
+/*-----------------------------------------------Item Block-----------------------------------------*/
 void USceneManager::CreateItemBlockByLocation(float x, float y, FString type)
 {
     UClass* item_class = nullptr;
@@ -268,13 +302,12 @@ void USceneManager::CreateItemBlockByLocation(float x, float y, FString type)
 	}
 
 	// Create the item block
-	FVector SpawnLocation = FVector(0.0f, 0.0f, 0.0f);
+	FVector SpawnLocation = FVector(0.0f, 0.0f, kHeight);
 	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 	AActor* ItemInstance = nullptr;
 	UWorld* World = GetWorld();
     if (World == nullptr) return;
-    item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_tree.BP_item_block_tree_C"));
-	ItemInstance = World->SpawnActor<AActor>(item_class, SpawnLocation + FVector(x_index * block_size, y_index * block_size, 0.0f), SpawnRotation);
+	ItemInstance = World->SpawnActor<AActor>(item_class, SpawnLocation + FVector(x, y, kHeight), SpawnRotation);
 
     //Update data system
 	for (int i = x_index; i < x_index + TypeToSizeMap[type].x_length; i++)
@@ -328,11 +361,23 @@ void USceneManager::GenerateItems()
     }
     else
     {
+        int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
+		int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
         for (int i = 55; i < 60; i++)
             for (int j = 55; j < 60; j++)
             {
                 CreateItemBlockByLocation(i * block_size, j * block_size, "item_block_tree");
             }
+        for (int i = 0; i < x_length; i++)
+        {
+            CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(block_size / 2), "item_block_transparent_wall");
+            CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(y_length * block_size - block_size / 2), "item_block_transparent_wall");
+        }
+        for (int i = 0; i < y_length; i++)
+        {
+			CreateItemBlockByLocation(static_cast<float>(block_size / 2), static_cast<float>(i * block_size + block_size / 2), "item_block_transparent_wall");
+            CreateItemBlockByLocation(static_cast<float>(x_length * block_size - block_size / 2), static_cast<float>(i * block_size + block_size / 2), "item_block_transparent_wall");
+        }
         GetGameInstance()->GetSubsystem<UDataSystem>()->set_is_items_initialized(true);
     }
     //DestroyItemBlockByLocation(55 * block_size, 55 * block_size);
@@ -341,5 +386,6 @@ UClass* USceneManager::TypeToClass(FString type)
 {
 	UClass* item_class = nullptr;
 	if (type == "item_block_tree") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_tree.BP_item_block_tree_C"));
+    else if (type == "item_block_transparent_wall") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_transparent_wall.BP_item_block_transparent_wall_C"));
 	return item_class;
 }
