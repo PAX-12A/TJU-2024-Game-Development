@@ -45,4 +45,6 @@ public:
 	TArray<FString> item_block_type_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	bool is_items_initialized_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<int32> item_block_status_;
 };

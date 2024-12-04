@@ -18,6 +18,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 
     TypeToSizeMap.Add("item_block_tree", { 2, 2 });
     TypeToSizeMap.Add("item_block_transparent_wall", { 1, 1 });
+    TypeToSizeMap.Add("item_block_crop_wheat", { 1, 1 });
 
     UWorld* World = GetWorld();
     if (World)
@@ -380,12 +381,15 @@ void USceneManager::GenerateItems()
         }
         GetGameInstance()->GetSubsystem<UDataSystem>()->set_is_items_initialized(true);
     }
-    //DestroyItemBlockByLocation(55 * block_size, 55 * block_size);
+
+    CreateItemBlockByLocation(3 * block_size, 3 * block_size, "item_block_crop_wheat");
+    CreateItemBlockByLocation(4 * block_size, 4 * block_size, "item_block_crop_wheat");
 }
 UClass* USceneManager::TypeToClass(FString type)
 {
 	UClass* item_class = nullptr;
 	if (type == "item_block_tree") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_tree.BP_item_block_tree_C"));
     else if (type == "item_block_transparent_wall") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_transparent_wall.BP_item_block_transparent_wall_C"));
+    else if (type == "item_block_crop_wheat") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_crop/BP_item_block_crop_wheat.BP_item_block_crop_wheat_C"));
 	return item_class;
 }
