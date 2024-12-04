@@ -34,6 +34,7 @@ private:
 	//Item block data
 	TArray<AItemBlockBase*> item_blocks_;
 	TArray<FString> item_block_type_;
+	TArray<int32> item_block_status_;
 	bool is_items_initialized_;
 private:
 	//Time data
@@ -70,6 +71,8 @@ public:
 	AItemBlockBase* get_item_block(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_blocks_.Num() && x * ground_block_y_length_ + y >= 0)return item_blocks_[x * ground_block_y_length_ + y]; else return nullptr; };
 	FString get_item_block_type(int32 index) { if (index < item_block_type_.Num() && index >= 0)return item_block_type_[index]; else return ""; };
 	FString get_item_block_type(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_type_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_type_[x * ground_block_y_length_ + y]; else return ""; };
+	int32 get_item_block_status(int32 index) { if (index < item_block_status_.Num() && index >= 0)return item_block_status_[index]; else return 0; };
+	int32 get_item_block_status(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_status_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_status_[x * ground_block_y_length_ + y]; else return 0; };
 	bool is_items_initialized() { return is_items_initialized_; };
 public:
 	//Weather data getters
@@ -104,6 +107,8 @@ public:
 	void set_item_block(int32 x, int32 y, AItemBlockBase* block) { set_item_block(x * ground_block_y_length_ + y, block); };
 	void set_item_block_type(int32 index, FString type) { while (item_block_type_.Num() <= index) { item_block_type_.Add(""); }; item_block_type_[index] = type; };
 	void set_item_block_type(int32 x, int32 y, FString type) { set_item_block_type(x * ground_block_y_length_ + y, type); };
+	void set_item_block_status(int32 index, int32 status) { while (item_block_status_.Num() <= index) { item_block_status_.Add(0); }; item_block_status_[index] = status; };
+	void set_item_block_status(int32 x, int32 y, int32 status) { set_item_block_status(x * ground_block_y_length_ + y, status); };
 	void set_is_items_initialized(bool is_initialized) { is_items_initialized_ = is_initialized; };
 
 	/*-----------------------------Others-----------------------------*/
