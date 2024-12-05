@@ -106,6 +106,13 @@ public:
 	 * 
 	 */
 	void GenerateItems();
+	/**
+	 * \brief Waters the crop at the given location.
+	 * 
+	 * \param x The x location of the crop
+	 * \param y The y location of the crop
+	 */
+	void WaterCropAtLocation(float x, float y);
 	UClass* TypeToClass(FString type);
 	struct item_size { int32 x_length; int32 y_length; };
 	TMap<FString, item_size> TypeToSizeMap;

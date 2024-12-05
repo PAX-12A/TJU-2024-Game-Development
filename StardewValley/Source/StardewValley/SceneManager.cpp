@@ -11,6 +11,7 @@
 #include "DataSystem.h"
 #include "EventSystem.h"
 #include <stdexcept>
+#include "item_block_crop.h"
 
 void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -28,6 +29,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
     GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundGenerated.AddUObject(this, &USceneManager::GenerateItems);
     GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &USceneManager::ChangeEarthGroundToSnowGround);
     GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &USceneManager::ChangeSnowGroundToEarthGround);
+    GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.AddUObject(this, &USceneManager::WaterCropAtLocation);
 
 }
 
@@ -382,8 +384,12 @@ void USceneManager::GenerateItems()
         GetGameInstance()->GetSubsystem<UDataSystem>()->set_is_items_initialized(true);
     }
 
+    /*----------------------------------------------TEST BLOCK------------------------------------------*/
     CreateItemBlockByLocation(3 * block_size, 3 * block_size, "item_block_crop_wheat");
     CreateItemBlockByLocation(4 * block_size, 4 * block_size, "item_block_crop_wheat");
+    GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
+    GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(3 * block_size, 3 * block_size);
+    /*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
 UClass* USceneManager::TypeToClass(FString type)
 {
@@ -392,4 +398,16 @@ UClass* USceneManager::TypeToClass(FString type)
     else if (type == "item_block_transparent_wall") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_transparent_wall.BP_item_block_transparent_wall_C"));
     else if (type == "item_block_crop_wheat") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_crop/BP_item_block_crop_wheat.BP_item_block_crop_wheat_C"));
 	return item_class;
+}
+void USceneManager::WaterCropAtLocation(float x, float y)
+{
+    int x_index, y_index;
+	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	AItemBlockBase* item_class = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(x_index, y_index);
+    if (Aitem_block_crop* crop_class = Cast<Aitem_block_crop>(item_class))
+	{
+        UE_LOG(LogTemp, Warning, TEXT("Watering Crop"));
+		crop_class->WaterThisCrop();
+	}
+    UE_LOG(LogTemp, Warning, TEXT("There's no crop here"));
 }

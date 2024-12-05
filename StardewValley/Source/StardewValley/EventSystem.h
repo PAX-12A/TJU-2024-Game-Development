@@ -13,6 +13,7 @@
 #include "EventSystem.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FMulticastDelegate);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoParams, float, float);
 
 /**
  * 
@@ -43,4 +44,6 @@ public:
 	FMulticastDelegate OnBaseTemperatureChanged;
 
 	FMulticastDelegate OnGroundGenerated;
+
+	FMulticastDelegateTwoParams WaterCropAtGivenPosition;
 };
