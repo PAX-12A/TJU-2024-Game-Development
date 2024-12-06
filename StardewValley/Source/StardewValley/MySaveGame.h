@@ -42,9 +42,11 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	int32 ground_block_size_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
-	TArray<FString> item_block_type_;
+	TArray<int32> item_block_id_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	bool is_items_initialized_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
-	TArray<int32> item_block_status_;
+	TArray<int32> item_block_lived_time_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<int32> item_block_durability_;
 };

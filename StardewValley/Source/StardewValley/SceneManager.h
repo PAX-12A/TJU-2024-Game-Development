@@ -91,9 +91,9 @@ public:
 	 * 
 	 * \param x The x location of the item block
 	 * \param y The y location of the item block
-	 * \param item_class The class of the item block to create
+	 * \param id The id of the item
 	 */
-	void CreateItemBlockByLocation(float x, float y, FString type);
+	void CreateItemBlockByLocation(float x, float y, int32 id);
 	/**
 	 * \brief Destroy the item block at the given location.
 	 * 
@@ -113,13 +113,23 @@ public:
 	 * \param y The y location of the crop
 	 */
 	void WaterCropAtLocation(float x, float y);
+	/**
+	 * \brief Handles the interaction.
+	 * 
+	 * \param interaction_type The type of the interaction, an int32
+	 * \param x The x location of the interaction, a float
+	 * \param y The y location of the interaction, a float
+	 */
+	void ItemBlockInteractionHandler(int32 interaction_type, int32 damage, float x, float y);
+
+
 	UClass* TypeToClass(FString type);
 	struct item_size { int32 x_length; int32 y_length; };
 	TMap<FString, item_size> TypeToSizeMap;
 private:
 	FTimerHandle timer_handler_;
 	const int kMaxLength = 128;
-	const int kDefaultBlockSize = 40;
+	const int kDefaultBlockSize = 200;
 	const int kHeight = 0;
 };
 

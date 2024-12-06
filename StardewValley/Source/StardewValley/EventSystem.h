@@ -14,6 +14,8 @@
 
 DECLARE_MULTICAST_DELEGATE(FMulticastDelegate);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoParams, float, float);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoInt32Params, int32, int32);
+DECLARE_MULTICAST_DELEGATE_FourParams(FMulticastDelegateFourParams, int32, int32, float, float);
 
 /**
  * 
@@ -46,4 +48,7 @@ public:
 	FMulticastDelegate OnGroundGenerated;
 
 	FMulticastDelegateTwoParams WaterCropAtGivenPosition;
+
+	FMulticastDelegateFourParams OnItemBlockAttacked;//Give it the interaction type(int32), the damage, and the position(float, float)
+	FMulticastDelegateTwoInt32Params OnGivenItems;//Give items (an int32 for the item id, an int32 for the amount) to the player(int32, int32)
 };

@@ -35,13 +35,17 @@ void UDataSystem::Initialize(FSubsystemCollectionBase& Collection)
 			set_ground_block_delta_temperature(i, LoadedGame->ground_block_delta_temperature_[i]);
 		}
 		set_is_items_initialized(LoadedGame->is_items_initialized_);
-		for (int i = 0; i < LoadedGame->item_block_status_.Num(); i++)
+		for (int i = 0; i < LoadedGame->item_block_lived_time_.Num(); i++)
 		{
-			set_item_block_status(i, LoadedGame->item_block_status_[i]);
+			set_item_block_lived_time(i, LoadedGame->item_block_lived_time_[i]);
 		}
-		for (int i = 0; i < LoadedGame->item_block_type_.Num(); i++)// Item block data loaded
+		for (int i = 0; i < LoadedGame->item_block_durability_.Num(); i++)
 		{
-			set_item_block_type(i, LoadedGame->item_block_type_[i]);
+			set_item_block_durability(i, LoadedGame->item_block_durability_[i]);
+		}
+		for (int i = 0; i < LoadedGame->item_block_id_.Num(); i++)// Item block data loaded
+		{
+			set_item_block_id(i, LoadedGame->item_block_id_[i]);
 		}
     }
 }
@@ -71,13 +75,17 @@ void UDataSystem::Deinitialize()
 			SaveGameInstance->ground_block_delta_temperature_.Add(ground_block_delta_temperature_[i]);
         }
 		SaveGameInstance->is_items_initialized_ = is_items_initialized_;
-		for (int i = 0; i < item_block_status_.Num(); i++)
+		for (int i = 0; i < item_block_lived_time_.Num(); i++)
 		{
-			SaveGameInstance->item_block_status_.Add(item_block_status_[i]);
+			SaveGameInstance->item_block_lived_time_.Add(item_block_lived_time_[i]);
 		}
-		for (int i = 0; i < item_block_type_.Num(); i++)//Item block data saved
+		for (int i = 0; i < item_block_durability_.Num(); i++)
 		{
-			SaveGameInstance->item_block_type_.Add(item_block_type_[i]);
+			SaveGameInstance->item_block_durability_.Add(item_block_durability_[i]);
+		}
+		for (int i = 0; i < item_block_id_.Num(); i++)//Item block data saved
+		{
+			SaveGameInstance->item_block_id_.Add(item_block_id_[i]);
 		}
 
         // Save the data to a file

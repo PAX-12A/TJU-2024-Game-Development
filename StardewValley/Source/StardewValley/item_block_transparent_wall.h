@@ -13,9 +13,5 @@ UCLASS()
 class STARDEWVALLEY_API Aitem_block_transparent_wall : public AItemBlockBase
 {
 	GENERATED_BODY()
-public:
-	UPROPERTY(VisibleAnywhere)
-	class UBoxComponent* wall_;
-public:
-	Aitem_block_transparent_wall();
+
 };

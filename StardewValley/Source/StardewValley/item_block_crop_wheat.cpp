@@ -7,14 +7,3 @@
  *********************************************************************/
 
 #include "item_block_crop_wheat.h"
-
-Aitem_block_crop_wheat::Aitem_block_crop_wheat()
-{
-}
-
-void Aitem_block_crop_wheat::BeginPlay()
-{
-	Super::BeginPlay();
-
-	lifespan_ = 3;
-}
