@@ -18,8 +18,5 @@ UCLASS()
 class STARDEWVALLEY_API Aitem_block_crop_wheat : public Aitem_block_crop
 {
 	GENERATED_BODY()
-	
-public:
-	Aitem_block_crop_wheat();
-	void BeginPlay() override;
+
 };

@@ -33,8 +33,9 @@ private:
 private:
 	//Item block data
 	TArray<AItemBlockBase*> item_blocks_;
-	TArray<FString> item_block_type_;
-	TArray<int32> item_block_status_;
+	TArray<int32> item_block_id_;
+	TArray<int32> item_block_lived_time_;
+	TArray<int32> item_block_durability_;
 	bool is_items_initialized_;
 private:
 	//Time data
@@ -69,10 +70,12 @@ public:
 	//Item block data getters
 	AItemBlockBase* get_item_block(int32 index) { if (index < item_blocks_.Num() && index >= 0)return item_blocks_[index]; else return nullptr; };
 	AItemBlockBase* get_item_block(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_blocks_.Num() && x * ground_block_y_length_ + y >= 0)return item_blocks_[x * ground_block_y_length_ + y]; else return nullptr; };
-	FString get_item_block_type(int32 index) { if (index < item_block_type_.Num() && index >= 0)return item_block_type_[index]; else return ""; };
-	FString get_item_block_type(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_type_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_type_[x * ground_block_y_length_ + y]; else return ""; };
-	int32 get_item_block_status(int32 index) { if (index < item_block_status_.Num() && index >= 0)return item_block_status_[index]; else return 0; };
-	int32 get_item_block_status(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_status_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_status_[x * ground_block_y_length_ + y]; else return 0; };
+	int32 get_item_block_id(int32 index) { if (index < item_block_id_.Num() && index >= 0)return item_block_id_[index]; else return -1; };
+	int32 get_item_block_id(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_id_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_id_[x * ground_block_y_length_ + y]; else return -1; };
+	int32 get_item_block_lived_time(int32 index) { if (index < item_block_lived_time_.Num() && index >= 0)return item_block_lived_time_[index]; else return -1; };
+	int32 get_item_block_lived_time(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_lived_time_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_lived_time_[x * ground_block_y_length_ + y]; else return -1; };
+	int32 get_item_block_durability(int32 index) { if (index < item_block_durability_.Num() && index >= 0)return item_block_durability_[index]; else return -1; };
+	int32 get_item_block_durability(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_durability_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_durability_[x * ground_block_y_length_ + y]; else return -1; };
 	bool is_items_initialized() { return is_items_initialized_; };
 public:
 	//Weather data getters
@@ -105,10 +108,12 @@ public:
 	//Item block data setters
 	void set_item_block(int32 index, AItemBlockBase* block) { while (item_blocks_.Num() <= index) { item_blocks_.Add(nullptr); }; item_blocks_[index] = block; };
 	void set_item_block(int32 x, int32 y, AItemBlockBase* block) { set_item_block(x * ground_block_y_length_ + y, block); };
-	void set_item_block_type(int32 index, FString type) { while (item_block_type_.Num() <= index) { item_block_type_.Add(""); }; item_block_type_[index] = type; };
-	void set_item_block_type(int32 x, int32 y, FString type) { set_item_block_type(x * ground_block_y_length_ + y, type); };
-	void set_item_block_status(int32 index, int32 status) { while (item_block_status_.Num() <= index) { item_block_status_.Add(0); }; item_block_status_[index] = status; };
-	void set_item_block_status(int32 x, int32 y, int32 status) { set_item_block_status(x * ground_block_y_length_ + y, status); };
+	void set_item_block_id(int32 index, int32 id) { while (item_block_id_.Num() <= index) { item_block_id_.Add(-1); }; item_block_id_[index] = id; };
+	void set_item_block_id(int32 x, int32 y, int32 id) { set_item_block_id(x * ground_block_y_length_ + y, id); };
+	void set_item_block_lived_time(int32 index, int32 status) { while (item_block_lived_time_.Num() <= index) { item_block_lived_time_.Add(-1); }; item_block_lived_time_[index] = status; };
+	void set_item_block_lived_time(int32 x, int32 y, int32 status) { set_item_block_lived_time(x * ground_block_y_length_ + y, status); };
+	void set_item_block_durability(int32 index, int32 durability) { while (item_block_durability_.Num() <= index) { item_block_durability_.Add(-1); }; item_block_durability_[index] = durability; };
+	void set_item_block_durability(int32 x, int32 y, int32 durability) { set_item_block_durability(x * ground_block_y_length_ + y, durability); };
 	void set_is_items_initialized(bool is_initialized) { is_items_initialized_ = is_initialized; };
 
 	/*-----------------------------Others-----------------------------*/

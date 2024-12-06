@@ -1,4 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "item_block_transparent_wall.h"
+#include "Struct_ItemBlockBase.h"

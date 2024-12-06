@@ -26,4 +26,7 @@ void UStardewValleyGameInstance::Init()
 	TimeSystem->set_day_in_season(DataSystem->get_day_in_season());
 	TimeSystem->set_season(DataSystem->get_present_season());
 	WeatherSystem->set_weather(DataSystem->get_present_weather());
+	DataSystem->set_ground_block_x_length(128);
+	DataSystem->set_ground_block_y_length(128);
+	DataSystem->set_ground_block_size(200);
 }
