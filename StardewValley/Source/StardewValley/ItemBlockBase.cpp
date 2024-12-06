@@ -94,13 +94,17 @@ void AItemBlockBase::Grow()
 	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
 	FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(id)), "");
 	int32 accumulated_time = 0;
-	for (auto status : item_info->map_lifespan_)
+	for (int32 i = 1; i <= item_info->map_lifespan_.Num(); i++)
 	{
-		accumulated_time += status.Value * 60;
-		if (lived_time_ < accumulated_time)
+		if(item_info->map_lifespan_.Contains(i))
 		{
-			SetAppearanceByStatus(status.Key);
-			break;
+			accumulated_time += item_info->map_lifespan_[i] * 60;
+			if (lived_time_ == accumulated_time)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Crop at %d, %d grows"), x_index, y_index);
+				SetAppearanceByStatus(i + 1);
+				break;
+			}
 		}
 	}
 	accumulated_time = 0;
@@ -131,7 +135,7 @@ void AItemBlockBase::RainWatersThisCrop()
 }
 void AItemBlockBase::SetAppearanceByStatus(int32 status)
 {
-	item_mesh_->SetWorldScale3D(FVector(status, status, status) / 50.0f);
+	item_mesh_->SetWorldScale3D(FVector(status, status, status) / 20.0f);
 }
 // Called when the game starts or when spawned
 void AItemBlockBase::BeginPlay()
