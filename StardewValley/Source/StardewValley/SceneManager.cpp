@@ -295,7 +295,7 @@ void USceneManager::CreateItemBlockByLocation(float x, float y, int32 id)
 	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
-	AItemBlockBase* ItemInstance = World->SpawnActor<AItemBlockBase>(AItemBlockBase::StaticClass(), SpawnLocation + FVector(x, y, kHeight), SpawnRotation);
+	AItemBlockBase* ItemInstance = World->SpawnActor<AItemBlockBase>(AItemBlockBase::StaticClass(), SpawnLocation + FVector(x_index * block_size + block_size / 2, y_index * block_size + block_size / 2, 0), SpawnRotation);
 	ItemInstance->InitializeItemBlock(id);
 
 	//Update data system
@@ -361,8 +361,8 @@ void USceneManager::GenerateItems()
 	}
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
-	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
 	CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
+	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(3 * block_size, 3 * block_size);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(0, 10, 4 * block_size, 4 * block_size);
@@ -389,7 +389,7 @@ void USceneManager::WaterCropAtLocation(float x, float y)
 	if (item_info == nullptr)return;
 	if (item_info->type_ == 1)//crop
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Watering Crop"));
+		UE_LOG(LogTemp, Warning, TEXT("Watering Crop %d, %d"), x_index, y_index);
 		item_class->WaterThisCrop();
 	}
 	UE_LOG(LogTemp, Warning, TEXT("There's no crop here"));
@@ -400,6 +400,7 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
 	int32 item_id = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_id(x_index, y_index);
 	
+	if (item_id == -1)return;
 	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
 	FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(item_id)), "");
 	if (item_info == nullptr)return;
