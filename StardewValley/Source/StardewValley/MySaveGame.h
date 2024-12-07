@@ -49,4 +49,8 @@ public:
 	TArray<int32> item_block_lived_time_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	TArray<int32> item_block_durability_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<bool> is_item_block_watered_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 real_time_;
 };

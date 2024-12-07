@@ -363,9 +363,9 @@ void USceneManager::GenerateItems()
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 	CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
 	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
+	//GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(3 * block_size, 3 * block_size);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(0, 10, 4 * block_size, 4 * block_size);
+	//GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(0, 10, 4 * block_size, 4 * block_size);
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
 UClass* USceneManager::TypeToClass(FString type)
@@ -389,10 +389,11 @@ void USceneManager::WaterCropAtLocation(float x, float y)
 	if (item_info == nullptr)return;
 	if (item_info->type_ == 1)//crop
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Watering Crop %d, %d"), x_index, y_index);
+		//UE_LOG(LogTemp, Warning, TEXT("Watering Crop %d, %d"), x_index, y_index);
 		item_class->WaterThisCrop();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("There's no crop here"));
+	else
+		UE_LOG(LogTemp, Warning, TEXT("There's no crop here"));
 }
 void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 damage, float x, float y)
 {
@@ -410,7 +411,7 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 		{
 			int32 previous_durability = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_durability(x_index, y_index);
 			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_durability(x_index, y_index, previous_durability - damage);
-			UE_LOG(LogTemp, Warning, TEXT("Durability: %d"), previous_durability - damage);
+			//UE_LOG(LogTemp, Warning, TEXT("Durability: %d"), previous_durability - damage);
 			if (previous_durability - damage <= 0)
 			{
 				for (auto item : item_info->map_item_drop_)

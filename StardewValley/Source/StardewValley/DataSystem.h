@@ -36,6 +36,7 @@ private:
 	TArray<int32> item_block_id_;
 	TArray<int32> item_block_lived_time_;
 	TArray<int32> item_block_durability_;
+	TArray<bool> is_item_block_watered_;
 	bool is_items_initialized_;
 private:
 	//Time data
@@ -43,6 +44,7 @@ private:
 	int32 day_in_season_;
 	int32 hour_;
 	int32 minute_;
+	int32 real_time_;
 private:
 	//Weather data
 	int32 present_weather_;
@@ -55,6 +57,7 @@ public:
 	int32 get_day_in_season() { return day_in_season_; };
 	int32 get_hour() { return hour_; };
 	int32 get_minute() { return minute_; };
+	int32 get_real_time() { return real_time_; };
 public:
 	//Ground block data getters
 	int32 get_ground_block_size() { return ground_block_size_; };
@@ -76,6 +79,8 @@ public:
 	int32 get_item_block_lived_time(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_lived_time_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_lived_time_[x * ground_block_y_length_ + y]; else return -1; };
 	int32 get_item_block_durability(int32 index) { if (index < item_block_durability_.Num() && index >= 0)return item_block_durability_[index]; else return -1; };
 	int32 get_item_block_durability(int32 x, int32 y) { if (x * ground_block_y_length_ + y < item_block_durability_.Num() && x * ground_block_y_length_ + y >= 0)return item_block_durability_[x * ground_block_y_length_ + y]; else return -1; };
+	bool get_is_item_block_watered(int32 index) { if (index < is_item_block_watered_.Num() && index >= 0)return is_item_block_watered_[index]; else return false; };
+	bool get_is_item_block_watered(int32 x, int32 y) { if (x * ground_block_y_length_ + y < is_item_block_watered_.Num() && x * ground_block_y_length_ + y >= 0)return is_item_block_watered_[x * ground_block_y_length_ + y]; else return false; };
 	bool is_items_initialized() { return is_items_initialized_; };
 public:
 	//Weather data getters
@@ -89,6 +94,7 @@ public:
 	void set_day_in_season(int32 day) { day_in_season_ = day; };
 	void set_hour(int32 hour) { hour_ = hour; };
 	void set_minute(int32 minute) { minute_ = minute; };
+	void set_real_time(int32 time) { real_time_ = time; };
 public:
 	//Weather data setters
 	void set_present_weather(int32 weather) { present_weather_ = weather; };
@@ -114,6 +120,8 @@ public:
 	void set_item_block_lived_time(int32 x, int32 y, int32 status) { set_item_block_lived_time(x * ground_block_y_length_ + y, status); };
 	void set_item_block_durability(int32 index, int32 durability) { while (item_block_durability_.Num() <= index) { item_block_durability_.Add(-1); }; item_block_durability_[index] = durability; };
 	void set_item_block_durability(int32 x, int32 y, int32 durability) { set_item_block_durability(x * ground_block_y_length_ + y, durability); };
+	void set_is_item_block_watered(int32 index, bool is_watered) { while (is_item_block_watered_.Num() <= index) { is_item_block_watered_.Add(false); }; is_item_block_watered_[index] = is_watered; };
+	void set_is_item_block_watered(int32 x, int32 y, bool is_watered) { set_is_item_block_watered(x * ground_block_y_length_ + y, is_watered); };
 	void set_is_items_initialized(bool is_initialized) { is_items_initialized_ = is_initialized; };
 
 	/*-----------------------------Others-----------------------------*/
@@ -121,4 +129,14 @@ public:
 	//Other functions
 	void Initialize(FSubsystemCollectionBase& Collection) override;
 	void Deinitialize() override;
+	/**
+	 * Saves the game.
+	 * 
+	 */
+	void SaveGame();
+	/**
+	 * Loads the game.
+	 * 
+	 */
+	void LoadGame();
 };
