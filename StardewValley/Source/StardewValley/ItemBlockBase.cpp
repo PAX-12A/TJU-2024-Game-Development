@@ -18,7 +18,7 @@ AItemBlockBase::AItemBlockBase()
 	RootComponent = item_mesh_;
 	box_ = CreateDefaultSubobject<UBoxComponent>(TEXT("wall_"));
 	box_->SetupAttachment(RootComponent);
-	
+
 }
 
 void AItemBlockBase::InitializeItemBlock(int32 id)
@@ -69,7 +69,7 @@ void AItemBlockBase::InitializeItemBlock(int32 id)
 					}
 				}
 			}
-			UE_LOG(LogTemp, Warning, TEXT("Crop at %d, %d : Scale %f, %f, %f, lived time %d"), x_index, y_index, item_mesh_->GetRelativeScale3D().X, item_mesh_->GetRelativeScale3D().Y, item_mesh_->GetRelativeScale3D().Z, lived_time_);
+			//UE_LOG(LogTemp, Warning, TEXT("Crop at %d, %d : Scale %f, %f, %f, lived time %d"), x_index, y_index, item_mesh_->GetRelativeScale3D().X, item_mesh_->GetRelativeScale3D().Y, item_mesh_->GetRelativeScale3D().Z, lived_time_);
 			is_today_watered_ = GetGameInstance()->GetSubsystem<UDataSystem>()->get_is_item_block_watered(x_index, y_index);
 			//UE_LOG(LogTemp, Warning, TEXT("Item block Initialized"));
 		}
@@ -82,6 +82,11 @@ void AItemBlockBase::InitializeItemBlock(int32 id)
 		{
 			box_->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			box_->SetCollisionResponseToAllChannels(ECR_Block);
+		}
+		else if (item_info->type_ == 3)//Destroyable things
+		{
+			item_mesh_->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			item_mesh_->SetCollisionResponseToAllChannels(ECR_Block);
 		}
 	}
 }
@@ -157,7 +162,7 @@ void AItemBlockBase::RainWatersThisCrop()
 }
 void AItemBlockBase::SetAppearanceByStatus(int32 status)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Status: %d"), status);
+	//UE_LOG(LogTemp, Warning, TEXT("Status: %d"), status);
 	int32 x = GetActorLocation().X;
 	int32 y = GetActorLocation().Y;
 	int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
@@ -186,7 +191,7 @@ void AItemBlockBase::SetAppearanceByStatus(int32 status)
 		};
 	FVector new_scale = CalculateScaleOfStatus(status);
 	item_mesh_->SetWorldScale3D(new_scale);
-	UE_LOG(LogTemp, Warning, TEXT("Scale: %f, %f, %f"), new_scale.X, new_scale.Y, new_scale.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("Scale: %f, %f, %f"), new_scale.X, new_scale.Y, new_scale.Z);
 }
 // Called when the game starts or when spawned
 void AItemBlockBase::BeginPlay()

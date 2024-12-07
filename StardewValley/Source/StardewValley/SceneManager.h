@@ -122,7 +122,6 @@ public:
 	 */
 	void ItemBlockInteractionHandler(int32 interaction_type, int32 damage, float x, float y);
 
-
 	UClass* TypeToClass(FString type);
 	struct item_size { int32 x_length; int32 y_length; };
 	TMap<FString, item_size> TypeToSizeMap;

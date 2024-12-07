@@ -345,17 +345,17 @@ void USceneManager::GenerateItems()
 		for (int i = 55; i < 60; i++)
 			for (int j = 55; j < 60; j++)
 			{
-				CreateItemBlockByLocation(i * block_size, j * block_size, 2);
+				CreateItemBlockByLocation(i * block_size, j * block_size, 7);
 			}
-		for (int i = 0; i < x_length; i++)
+		for (int i = 0; i < x_length; i++)//wall
 		{
-			CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(block_size / 2), 0);
-			CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(y_length * block_size - block_size / 2), 0);
+			CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(block_size / 2), 4);
+			CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(y_length * block_size - block_size / 2), 4);
 		}
-		for (int i = 0; i < y_length; i++)
+		for (int i = 0; i < y_length; i++)//wall
 		{
-			CreateItemBlockByLocation(static_cast<float>(block_size / 2), static_cast<float>(i * block_size + block_size / 2), 0);
-			CreateItemBlockByLocation(static_cast<float>(x_length * block_size - block_size / 2), static_cast<float>(i * block_size + block_size / 2), 0);
+			CreateItemBlockByLocation(static_cast<float>(block_size / 2), static_cast<float>(i * block_size + block_size / 2), 4);
+			CreateItemBlockByLocation(static_cast<float>(x_length * block_size - block_size / 2), static_cast<float>(i * block_size + block_size / 2), 4);
 		}
 		GetGameInstance()->GetSubsystem<UDataSystem>()->set_is_items_initialized(true);
 	}
@@ -363,9 +363,9 @@ void USceneManager::GenerateItems()
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 	CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
 	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
-	//GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(3 * block_size, 3 * block_size);
-	//GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(0, 10, 4 * block_size, 4 * block_size);
+	//GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(2, 30, 57 * block_size, 57 * block_size);
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
 UClass* USceneManager::TypeToClass(FString type)
@@ -392,8 +392,6 @@ void USceneManager::WaterCropAtLocation(float x, float y)
 		//UE_LOG(LogTemp, Warning, TEXT("Watering Crop %d, %d"), x_index, y_index);
 		item_class->WaterThisCrop();
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("There's no crop here"));
 }
 void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 damage, float x, float y)
 {
