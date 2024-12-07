@@ -43,6 +43,7 @@ private:
 	int32 minute_;
 
 	FTimerHandle timer_handle_;
+	FTimerHandle real_time_handle_;
 
 	UPROPERTY(VisibleAnywhere)
 	float time_flow_speed_;
@@ -73,4 +74,6 @@ public:
 
 	UFUNCTION()
 	void TimeFlow();
+
+	void RealTimeRecord();
 };

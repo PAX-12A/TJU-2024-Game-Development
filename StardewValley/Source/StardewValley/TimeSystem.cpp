@@ -23,8 +23,11 @@ void UTimeSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	FTimerDelegate timer_delegate;
+	FTimerDelegate real_time_delegate;
 	timer_delegate.BindUObject(this, &UTimeSystem::TimeFlow);
+	real_time_delegate.BindUObject(this, &UTimeSystem::RealTimeRecord);
 	GetGameInstance()->GetWorld()->GetTimerManager().SetTimer(timer_handle_, timer_delegate, time_flow_speed_, true);
+	GetGameInstance()->GetWorld()->GetTimerManager().SetTimer(real_time_handle_, real_time_delegate, 1.0f, true);
 }
 
 void UTimeSystem::Deinitialize()
@@ -160,4 +163,11 @@ void UTimeSystem::TimeFlow()
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Time now is Season: %d, Day: %d, Hour: %d, minute: %d"), static_cast<int>(get_season()), get_day_in_season(), get_hour(), get_minute());
+}
+
+void UTimeSystem::RealTimeRecord()
+{
+	int32 real_time = GetGameInstance()->GetSubsystem<UDataSystem>()->get_real_time() + 1;
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_real_time(real_time);
+	//UE_LOG(LogTemp, Warning, TEXT("Real time: %d sec(s)"), real_time);
 }
