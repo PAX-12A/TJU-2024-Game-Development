@@ -88,6 +88,18 @@ void AItemBlockBase::InitializeItemBlock(int32 id)
 			item_mesh_->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			item_mesh_->SetCollisionResponseToAllChannels(ECR_Block);
 		}
+		else if (item_info->type_ == 4)//Fire
+		{
+			for (int32 i = -5; i <= 5; i++)
+				for (int32 j = -5; j <= 5; j++)
+				{
+					if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block(x_index + i, y_index + j) != nullptr)//There is a ground block.
+					{
+						int32 new_delta_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_delta_temperature(x_index + i, y_index + j) + 20;
+						GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(x_index + i, y_index + j, new_delta_temperature);
+					}
+				}
+		}
 	}
 }
 

@@ -102,12 +102,12 @@ void UWeatherSystem::UpdateBaseTemperature()
 	switch (current_weather)
 	{
 	case 0:
-		base_temperature += 5;
+		base_temperature += 3;
 		break;
 	case 1:
 		break;
 	case 2:
-		base_temperature -= 5;
+		base_temperature -= 2;
 		break;
 	case 3:
 		base_temperature -= 10;

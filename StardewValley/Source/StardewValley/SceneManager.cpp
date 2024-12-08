@@ -163,7 +163,7 @@ int32 USceneManager::GetGroundBlockTemperatureByLocation(float x, float y)
 		UE_LOG(LogTemp, Error, TEXT("SceneManager.cpp: DestroyGroundBlockByLocation: %s"), *FString(e.what()));
 		throw std::out_of_range("Out of range");
 	}
-	int32 base_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_base_temprature();
+	int32 base_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_base_temperature();
 	int32 delta_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_delta_temperature(index_x, index_y);
 	return base_temperature + delta_temperature;
 }
@@ -315,6 +315,9 @@ void USceneManager::DestroyItemBlockByLocation(float x, float y)
 		return;
 	}
 
+	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
+	FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_id(index_x, index_y))), "");
+
 	//Update data system
 	AItemBlockBase* item_block = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(index_x, index_y);
 	if (item_block == nullptr)return;
@@ -322,6 +325,21 @@ void USceneManager::DestroyItemBlockByLocation(float x, float y)
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_lived_time(index_x, index_y, -1);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_durability(index_x, index_y, -1);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block(index_x, index_y, nullptr);
+	if (item_info != nullptr)
+	{
+		if (item_info->type_ == 4)//Fire
+		{
+			for (int32 i = -5; i <= 5; i++)
+				for (int32 j = -5; j <= 5; j++)
+				{
+					if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block(index_x + i, index_y + j) != nullptr)
+					{
+						int32 new_delta_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_delta_temperature(index_x + i, index_y + j) - 20;
+						GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(index_x + i, index_y + j, new_delta_temperature);
+					}
+				}
+		}
+	}
 
 	//Destroy
 	bool is_destroyed = item_block->Destroy();
@@ -342,11 +360,11 @@ void USceneManager::GenerateItems()
 	{
 		int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
 		int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
-		for (int i = 55; i < 60; i++)
+		/*for (int i = 55; i < 60; i++)
 			for (int j = 55; j < 60; j++)
 			{
 				CreateItemBlockByLocation(i * block_size, j * block_size, 7);
-			}
+			}*/
 		for (int i = 0; i < x_length; i++)//wall
 		{
 			CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(block_size / 2), 4);
@@ -361,14 +379,15 @@ void USceneManager::GenerateItems()
 	}
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
-	CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
+	/*CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
 	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(3 * block_size, 3 * block_size);
-	//GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(2, 30, 57 * block_size, 57 * block_size);
+	UE_LOG(LogTemp, Warning, TEXT("Temperature at 57, 57 is %d"), GetGroundBlockTemperatureByLocation(57 * block_size, 57 * block_size));
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(2, 30, 57 * block_size, 57 * block_size);*/
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
-UClass* USceneManager::TypeToClass(FString type)
+UClass* USceneManager::TypeToClass(FString type)//unused.
 {
 	UClass* item_class = nullptr;
 	if (type == "item_block_tree") item_class = LoadObject<UClass>(nullptr, TEXT("/Game/ItemBlock/BP_item_block_tree.BP_item_block_tree_C"));
