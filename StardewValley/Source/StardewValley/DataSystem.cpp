@@ -46,7 +46,7 @@ void UDataSystem::SaveGame()
 		for (int i = 0; i < ground_block_x_length_ * ground_block_y_length_; i++)//Ground block data saved
 		{
 			SaveGameInstance->ground_block_type_.Add(ground_block_type_[i]);
-			SaveGameInstance->ground_block_delta_temperature_.Add(ground_block_delta_temperature_[i]);
+			//SaveGameInstance->ground_block_delta_temperature_.Add(ground_block_delta_temperature_[i]);
 		}
 		SaveGameInstance->is_items_initialized_ = is_items_initialized_;
 		for (int i = 0; i < item_block_lived_time_.Num(); i++)
@@ -98,7 +98,7 @@ void UDataSystem::LoadGame()
 		for (int i = 0; i < ground_block_x_length_ * ground_block_y_length_; i++)// Ground block data loaded
 		{
 			set_ground_block_type(i, LoadedGame->ground_block_type_[i]);
-			set_ground_block_delta_temperature(i, LoadedGame->ground_block_delta_temperature_[i]);
+			//set_ground_block_delta_temperature(i, LoadedGame->ground_block_delta_temperature_[i]);
 		}
 		set_is_items_initialized(LoadedGame->is_items_initialized_);
 		for (int i = 0; i < LoadedGame->item_block_lived_time_.Num(); i++)

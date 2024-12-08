@@ -85,7 +85,7 @@ public:
 public:
 	//Weather data getters
 	int32 get_present_weather() { return present_weather_; };
-	int32 get_present_base_temprature() { return present_base_temperature_; };
+	int32 get_present_base_temperature() { return present_base_temperature_; };
 
 	/*-----------------------------Setters-----------------------------*/
 public:
