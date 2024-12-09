@@ -11,6 +11,7 @@
 #include "TimeSystem.h"
 #include "WeatherSystem.h"
 #include "SceneManager.h"
+#include "UserInterface.h"
 
 void UStardewValleyGameInstance::Init()
 {
@@ -29,4 +30,5 @@ void UStardewValleyGameInstance::Init()
 	DataSystem->set_ground_block_x_length(128);
 	DataSystem->set_ground_block_y_length(128);
 	DataSystem->set_ground_block_size(200);
+
 }

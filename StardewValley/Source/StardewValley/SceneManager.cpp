@@ -14,6 +14,7 @@
 #include "ItemBlockBase.h"
 #include "Engine/DataTable.h"
 #include "Struct_ItemBlockBase.h"
+#include "UserInterface.h"
 
 void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -363,7 +364,7 @@ void USceneManager::GenerateItems()
 		/*for (int i = 55; i < 60; i++)
 			for (int j = 55; j < 60; j++)
 			{
-				CreateItemBlockByLocation(i * block_size, j * block_size, 7);
+				CreateItemBlockByLocation(i * block_size, j * block_size, 2);
 			}*/
 		for (int i = 0; i < x_length; i++)//wall
 		{
@@ -379,6 +380,20 @@ void USceneManager::GenerateItems()
 	}
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
+	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));
+	UE_LOG(LogTemp, Warning, TEXT("WidgetClass loaded"));
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	if (WidgetClass)
+	{
+		UUserWidget* Widget = CreateWidget<UUserWidget>(GetGameInstance(), WidgetClass);
+		UE_LOG(LogTemp, Warning, TEXT("WidgetClass created"));
+
+		if (Widget)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Widget created"));
+			Widget->AddToViewport();
+		}
+	}
 	/*CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
 	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
