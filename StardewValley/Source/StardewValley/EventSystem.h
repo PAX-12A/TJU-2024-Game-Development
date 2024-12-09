@@ -56,4 +56,5 @@ public:
 	FMulticastDelegateOneParam OnInterfaceChanged;//Give it the interface index(int32)
 	FMulticastDelegate OnExitGame;//Exit the game
 	FMulticastDelegate OnReturnTitle;//Return to title
+	FMulticastDelegate OnAnExpBarFull;//An exp bar is full
 };

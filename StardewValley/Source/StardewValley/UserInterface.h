@@ -52,6 +52,33 @@ public:
 	void ReturnToTitle();
 	UFUNCTION()
 	void ConfigOption();
+public:
+	//Player
+	/**
+	 * \brief Increase the progress bar value.
+	 * 
+	 * \param bar The progress bar.
+	 * \param value The value to increase.
+	 */
+	void IncreaseProgressBarValue(class UProgressBar* bar, float value);
+	/**
+	 * \brief Set the progress bar value.
+	 * 
+	 * \param bar A progress bar.
+	 * \param value The value to set.
+	 */
+	void SetProgressBarValue(class UProgressBar* bar, float value);
+	void EnableALevelUpButton();
+	UFUNCTION()
+	void AxeLevelUp();
+	UFUNCTION()
+	void HoeLevelUp();
+	UFUNCTION()
+	void ScytheLevelUp();
+public:
+	//Debug panel
+	UFUNCTION()
+	void DEBUGGER();
 protected:
-	
+	TMap<int32, int32> ItemsInBag;//id -> amount
 };
