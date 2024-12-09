@@ -10,6 +10,10 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
+#include "Components/WrapBox.h"
+#include "Components/TextBlock.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "EventSystem.h"
 #include "DataSystem.h"
@@ -187,24 +191,27 @@ void UUserInterface::EnableALevelUpButton()
 	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
 	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
 	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
+	UProgressBar* BarAexSkill = Cast<UProgressBar>(GetWidgetFromName("BarAexSkill"));
+	UProgressBar* BarHoeSkill = Cast<UProgressBar>(GetWidgetFromName("BarHoeSkill"));
+	UProgressBar* BarScytheSkill = Cast<UProgressBar>(GetWidgetFromName("BarScytheSkill"));
 	UButton* BtnAexUp = Cast<UButton>(GetWidgetFromName("BtnAexUp"));
 	UButton* BtnHoeUp = Cast<UButton>(GetWidgetFromName("BtnHoeUp"));
 	UButton* BtnScytheUp = Cast<UButton>(GetWidgetFromName("BtnScytheUp"));
 	if (BarAexExp != nullptr)
 	{
-		if (BarAexExp->Percent == 1.0f)
+		if (BarAexExp->Percent == 1.0f && fabs(BarAexSkill->Percent - 1.0f) > KINDA_SMALL_NUMBER)
 		{
 			BtnAexUp->SetIsEnabled(true);
 		}
 	}
-	if (BarHoeExp != nullptr)
+	if (BarHoeExp != nullptr && fabs(BarHoeSkill->Percent - 1.0f) > KINDA_SMALL_NUMBER)
 	{
 		if (BarHoeExp->Percent == 1.0f)
 		{
 			BtnHoeUp->SetIsEnabled(true);
 		}
 	}
-	if (BarScytheExp != nullptr)
+	if (BarScytheExp != nullptr && fabs(BarScytheSkill->Percent - 1.0f) > KINDA_SMALL_NUMBER)
 	{
 		if (BarScytheExp->Percent == 1.0f)
 		{
@@ -241,10 +248,80 @@ void UUserInterface::ScytheLevelUp()
 }
 void UUserInterface::DEBUGGER()
 {
-	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
-	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
-	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
-	IncreaseProgressBarValue(BarAexExp, 0.1f);
-	IncreaseProgressBarValue(BarHoeExp, 0.2f);
-	IncreaseProgressBarValue(BarScytheExp, 0.3f);
+	AddItemToBag(23, 100);
+	AddItemToBag(21, 1);
+	RemoveItemFromBag(23, 99);
+}
+void UUserInterface::AddItemToBag(int32 id, int32 amount)
+{
+	if (ItemsInBag.Contains(id))//If the item is already in the bag, increase the amount of the item in the bag
+	{
+		ItemsInBag[id] += amount;
+		FName name = FName("BtnItem" + FString::FromInt(id));
+		UButton* BtnItem = Cast<UButton>(GetWidgetFromName(name));
+		if (BtnItem != nullptr)
+		{
+			FName text_name = FName("TextAmount" + FString::FromInt(id));
+			UTextBlock* TextAmount = Cast<UTextBlock>(GetWidgetFromName(text_name));
+			if (TextAmount != nullptr)
+			{
+				TextAmount->SetText(FText::FromString(FString::FromInt(ItemsInBag[id])));
+			}
+		}
+	}
+	else//If the item is not in the bag, add the item to the bag
+	{
+		ItemsInBag.Add(id, amount);
+		FName name = FName("BtnItem" + FString::FromInt(id));
+		UButton* BtnItem = NewObject<UButton>(GetWorld(), UButton::StaticClass(), name);
+		BtnItem->SetRenderScale(FVector2D(3.5f, 2.5f));
+
+		FName text_name = FName("TextAmount" + FString::FromInt(id));
+		UTextBlock* TextAmount = NewObject<UTextBlock>(GetWorld(), UTextBlock::StaticClass(), text_name);
+		TextAmount->SetRenderScale(FVector2D(1.0f, 1.0f));
+		TextAmount->SetRenderTranslation(FVector2D(0.0f, 14.0f));
+		TextAmount->SetText(FText::FromString(FString::FromInt(ItemsInBag[id])));
+
+		FName overlay_name = FName("Overlay" + FString::FromInt(id));
+		UOverlay* overlay = NewObject<UOverlay>(GetWorld(), UOverlay::StaticClass(), overlay_name);
+		overlay->AddChild(BtnItem);
+		overlay->AddChild(TextAmount);
+
+		UWrapBox* ListItemBag = Cast<UWrapBox>(GetWidgetFromName("ListItemBag"));
+		if (ListItemBag != nullptr)
+		{
+			ListItemBag->AddChild(overlay);
+		}
+	}
+}
+void UUserInterface::RemoveItemFromBag(int32 id, int32 amount)
+{
+	if (ItemsInBag.Contains(id))
+	{
+		int32 left_amount = ItemsInBag[id] - amount;
+		if (left_amount <= 0)
+		{
+			ItemsInBag.Remove(id);
+			FName name = FName("Overlay" + FString::FromInt(id));
+			UOverlay* overlay = Cast<UOverlay>(GetWidgetFromName(name));
+			if (overlay != nullptr)
+			{
+				overlay->RemoveFromParent();
+			}
+		}
+		else
+		{
+			ItemsInBag[id] = left_amount;
+			FName text_name = FName("TextAmount" + FString::FromInt(id));
+			UTextBlock* TextAmount = Cast<UTextBlock>(GetWidgetFromName(text_name));
+			if (TextAmount != nullptr)
+			{
+				TextAmount->SetText(FText::FromString(FString::FromInt(ItemsInBag[id])));
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Item (id = %d) is not in the bag, so you cannot remove it"), id);
+	}
 }

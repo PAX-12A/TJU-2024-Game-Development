@@ -53,7 +53,7 @@ public:
 	UFUNCTION()
 	void ConfigOption();
 public:
-	//Player
+	//Player panel
 	/**
 	 * \brief Increase the progress bar value.
 	 * 
@@ -75,6 +75,22 @@ public:
 	void HoeLevelUp();
 	UFUNCTION()
 	void ScytheLevelUp();
+public:
+	//Bag panel
+	/**
+	 * \brief Add an amount of item(s) to the bag.
+	 * 
+	 * \param id The id of the item.
+	 * \param amount The amount of the item.
+	 */
+	void AddItemToBag(int32 id, int32 amount);
+	/**
+	 * \brief Remove an amount of item(s) from the bag.
+	 * 
+	 * \param id The id of the item.
+	 * \param amount The amount of the item.
+	 */
+	void RemoveItemFromBag(int32 id, int32 amount);
 public:
 	//Debug panel
 	UFUNCTION()
