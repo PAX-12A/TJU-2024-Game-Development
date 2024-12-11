@@ -57,4 +57,6 @@ public:
 	FMulticastDelegate OnExitGame;//Exit the game
 	FMulticastDelegate OnReturnTitle;//Return to title
 	FMulticastDelegate OnAnExpBarFull;//An exp bar is full
+	FMulticastDelegateTwoInt32Params OnItemAddedToShortcutBar;//Give it the item id(int32) and the index(int32) of the item in the shortcut bar
+	FMulticastDelegateOneParam OnItemRemovedFromShortcutBar;//Give it the index(int32) of the item in the shortcut bar
 };

@@ -9,11 +9,21 @@
 #include "UserInterface.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/Button.h"
+#include "ItemButton.h"
 #include "Components/ProgressBar.h"
 #include "Components/WrapBox.h"
 #include "Components/TextBlock.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
+#include "Components/Image.h"
+#include "Components/BrushComponent.h"
+#include "Components/CanvasPanel.h"
+#include "Engine/Texture2D.h"
+#include "SlateBasics.h"
+#include "SlateCore.h"
+#include "Engine/DataTable.h"
+#include "Struct_ItemBase.h"
+#include "Engine/StreamableManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "EventSystem.h"
 #include "DataSystem.h"
@@ -25,6 +35,8 @@ bool UUserInterface::Initialize()
 		return false;
 	}
 
+	item_selected_ = -1;
+
 	/*--------------------------------Change the panel---------------------------------*/
 	UButton* BtnBag = Cast<UButton>(GetWidgetFromName("BtnBag"));
 	UButton* BtnPlayer = Cast<UButton>(GetWidgetFromName("BtnPlayer"));
@@ -35,26 +47,32 @@ bool UUserInterface::Initialize()
 	if (BtnBag != nullptr)
 	{
 		BtnBag->OnClicked.AddDynamic(this, &UUserInterface::ChangeToBag);
+		BtnBag->OnClicked.AddDynamic(this, &UUserInterface::OnItemDeselected);
 	}
 	if (BtnPlayer != nullptr)
 	{
 		BtnPlayer->OnClicked.AddDynamic(this, &UUserInterface::ChangeToPlayer);
+		BtnPlayer->OnClicked.AddDynamic(this, &UUserInterface::OnItemDeselected);
 	}
 	if (BtnSocial != nullptr)
 	{
 		BtnSocial->OnClicked.AddDynamic(this, &UUserInterface::ChangeToSocial);
+		BtnSocial->OnClicked.AddDynamic(this, &UUserInterface::OnItemDeselected);
 	}
 	if (BtnCraft != nullptr)
 	{
 		BtnCraft->OnClicked.AddDynamic(this, &UUserInterface::ChangeToCraft);
+		BtnCraft->OnClicked.AddDynamic(this, &UUserInterface::OnItemDeselected);
 	}
 	if (BtnSystem != nullptr)
 	{
 		BtnSystem->OnClicked.AddDynamic(this, &UUserInterface::ChangeToSystem);
+		BtnSystem->OnClicked.AddDynamic(this, &UUserInterface::OnItemDeselected);
 	}
 	if (BtnDebug != nullptr)
 	{
 		BtnDebug->OnClicked.AddDynamic(this, &UUserInterface::ChangeToDebug);
+		BtnDebug->OnClicked.AddDynamic(this, &UUserInterface::OnItemDeselected);
 	}
 
 	/*--------------------------------System Panel---------------------------------*/
@@ -117,6 +135,20 @@ bool UUserInterface::Initialize()
 	BtnHoeUp->OnClicked.AddDynamic(this, &UUserInterface::HoeLevelUp);
 	BtnScytheUp->OnClicked.AddDynamic(this, &UUserInterface::ScytheLevelUp);
 	/*--------------------------------Bag Panel---------------------------------*/
+	for (int32 i = 1; i <= 10; ++i)
+	{
+		FString ButtonName = FString::Printf(TEXT("BtnShortcut_%d"), i);
+		UItemButton* BtnShortcut = Cast<UItemButton>(GetWidgetFromName(*ButtonName));
+
+		if (BtnShortcut)
+		{
+			BtnShortcut->OnShortcutSelected.AddUObject(this, &UUserInterface::OnShortcutSelected);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Button %s not found or is nullptr"), *ButtonName);
+		}
+	}
 
 	/*--------------------------------Debug Panel---------------------------------*/
 	UButton* Debugger = Cast<UButton>(GetWidgetFromName("Debugger"));
@@ -248,9 +280,8 @@ void UUserInterface::ScytheLevelUp()
 }
 void UUserInterface::DEBUGGER()
 {
-	AddItemToBag(23, 100);
-	AddItemToBag(21, 1);
-	RemoveItemFromBag(23, 99);
+	for (int32 i = 0; i < 66; i++)
+		AddItemToBag(i, 1);
 }
 void UUserInterface::AddItemToBag(int32 id, int32 amount)
 {
@@ -258,7 +289,7 @@ void UUserInterface::AddItemToBag(int32 id, int32 amount)
 	{
 		ItemsInBag[id] += amount;
 		FName name = FName("BtnItem" + FString::FromInt(id));
-		UButton* BtnItem = Cast<UButton>(GetWidgetFromName(name));
+		UItemButton* BtnItem = Cast<UItemButton>(GetWidgetFromName(name));
 		if (BtnItem != nullptr)
 		{
 			FName text_name = FName("TextAmount" + FString::FromInt(id));
@@ -272,19 +303,45 @@ void UUserInterface::AddItemToBag(int32 id, int32 amount)
 	else//If the item is not in the bag, add the item to the bag
 	{
 		ItemsInBag.Add(id, amount);
+
 		FName name = FName("BtnItem" + FString::FromInt(id));
-		UButton* BtnItem = NewObject<UButton>(GetWorld(), UButton::StaticClass(), name);
+		UItemButton* BtnItem = NewObject<UItemButton>(GetWorld(), UItemButton::StaticClass(), name);
 		BtnItem->SetRenderScale(FVector2D(3.5f, 2.5f));
+
+		BtnItem->OnItemSelected.AddUObject(this, &UUserInterface::OnItemSelected);
 
 		FName text_name = FName("TextAmount" + FString::FromInt(id));
 		UTextBlock* TextAmount = NewObject<UTextBlock>(GetWorld(), UTextBlock::StaticClass(), text_name);
+		TextAmount->SetColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 1.0f));//Set the color black.
 		TextAmount->SetRenderScale(FVector2D(1.0f, 1.0f));
 		TextAmount->SetRenderTranslation(FVector2D(0.0f, 14.0f));
 		TextAmount->SetText(FText::FromString(FString::FromInt(ItemsInBag[id])));
 
+		UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
+		FStruct_ItemBase* item_info = item_data_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(id)), "");
+		FName image_name = FName("Image" + FString::FromInt(id));
+		UImage* Image = NewObject<UImage>(GetWorld(), UImage::StaticClass(), image_name);
+		if (item_info != nullptr)
+		{
+			UTexture2D* texture = item_info->icon_;
+			FSlateBrush brush;
+			brush.SetResourceObject(texture);
+			Image->SetBrush(brush);
+			Image->SetBrushSize(FVector2D(20.0, 30.0));
+		}
+		else
+		{
+			UTexture2D* texture = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Asset/Icon/Ico_Test_4oD.Ico_Test_4oD'"));
+			FSlateBrush brush;
+			brush.SetResourceObject(texture);
+			Image->SetBrush(brush);
+			Image->SetBrushSize(FVector2D(20.0, 30.0));
+		}
+
 		FName overlay_name = FName("Overlay" + FString::FromInt(id));
 		UOverlay* overlay = NewObject<UOverlay>(GetWorld(), UOverlay::StaticClass(), overlay_name);
 		overlay->AddChild(BtnItem);
+		BtnItem->AddChild(Image);
 		overlay->AddChild(TextAmount);
 
 		UWrapBox* ListItemBag = Cast<UWrapBox>(GetWidgetFromName("ListItemBag"));
@@ -323,5 +380,125 @@ void UUserInterface::RemoveItemFromBag(int32 id, int32 amount)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Item (id = %d) is not in the bag, so you cannot remove it"), id);
+	}
+}
+void UUserInterface::OnItemSelected(int32 id)
+{
+	if (item_selected_ == id)
+	{
+		OnItemDeselected();
+		return;
+	}
+	if (item_selected_ != -1) OnItemDeselected();
+	item_selected_ = id;
+
+	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
+	FStruct_ItemBase* item_info = item_data_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(id)), "");
+
+	FName image_icon_name = FName("ImageIcon" + FString::FromInt(id));
+	UImage* image_icon = NewObject<UImage>(GetWorld(), UImage::StaticClass(), image_icon_name);
+	if (item_info != nullptr)
+	{
+		UTexture2D* texture = item_info->icon_;
+		FSlateBrush brush;
+		brush.SetResourceObject(texture);
+		image_icon->SetBrush(brush);
+		image_icon->SetBrushSize(FVector2D(20.0, 30.0));
+	}
+	else
+	{
+		UTexture2D* texture = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Asset/Icon/Ico_Test_4oD.Ico_Test_4oD'"));
+		FSlateBrush brush;
+		brush.SetResourceObject(texture);
+		image_icon->SetBrush(brush);
+		image_icon->SetBrushSize(FVector2D(20.0, 30.0));
+	}
+
+	UCanvasPanel* CanvasPanel_0 = Cast<UCanvasPanel>(GetWidgetFromName("CanvasPanel_0"));
+	CanvasPanel_0->AddChild(image_icon);
+}
+void UUserInterface::OnItemDeselected()
+{
+	if (item_selected_ == -1) return;
+	FName image_icon_name = FName("ImageIcon" + FString::FromInt(item_selected_));
+	UImage* image_icon = Cast<UImage>(GetWidgetFromName(image_icon_name));
+	if (image_icon != nullptr)
+	{
+		image_icon->RemoveFromParent();
+	}
+	item_selected_ = -1;
+}
+void UUserInterface::OnShortcutSelected(int32 index)
+{
+	FName name = FName("BtnShortcut_" + FString::FromInt(index));
+	UItemButton* button = Cast<UItemButton>(GetWidgetFromName(name));
+	button->SetRenderTransformPivot(FVector2D(0.0f, 0.0f));
+	UImage* image = Cast<UImage>(button->GetChildAt(0));
+	if (item_selected_ == -1)
+	{
+		if (image != nullptr && image->GetName().Left(16) == "ShortcutItemIcon")//Remove it.
+		{
+			button->SetRenderScale(FVector2D(3.5f, 2.5f));
+			UTexture2D* texture = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Asset/Icon/Ico_Axe_Level1.Ico_Axe_Level1'"));
+			FSlateBrush brush;
+			brush.SetResourceObject(texture);
+			image->SetBrush(brush);
+			image->SetBrushSize(FVector2D(20.0, 30.0));
+
+			FString new_name = FString::Printf(TEXT("IcoShortcut_%d"), index);
+			const TCHAR* the_new_name = new_name.GetCharArray().GetData();
+			image->Rename(the_new_name);
+
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemRemovedFromShortcutBar.Broadcast(index);
+		}
+	}
+	else//Add it.
+	{
+		button->SetRenderScale(FVector2D(3.5f, 2.5f));
+		FString new_name = FString::Printf(TEXT("ShortcutItemIcon%d"), index);
+		const TCHAR* the_new_name = new_name.GetCharArray().GetData();
+		image->Rename(the_new_name);
+
+		UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
+		FStruct_ItemBase* item_info = item_data_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(item_selected_)), "");
+		if (item_info != nullptr)
+		{
+			UTexture2D* texture = item_info->icon_;
+			FSlateBrush brush;
+			brush.SetResourceObject(texture);
+			image->SetBrush(brush);
+			image->SetBrushSize(FVector2D(20.0, 30.0));
+		}
+		else
+		{
+			UTexture2D* texture = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Asset/Icon/Ico_Test_4oD.Ico_Test_4oD'"));
+			FSlateBrush brush;
+			brush.SetResourceObject(texture);
+			image->SetBrush(brush);
+			image->SetBrushSize(FVector2D(20.0, 30.0));
+		}
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemAddedToShortcutBar.Broadcast(item_selected_, index);
+		OnItemDeselected();
+	}
+}
+
+void UUserInterface::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (item_selected_ != -1)
+	{
+		APlayerController* player_controller = GetWorld()->GetFirstPlayerController();
+
+		if (player_controller != nullptr)
+		{
+			FVector2D MousePosition;
+			player_controller->GetMousePosition(MousePosition.X, MousePosition.Y);
+
+			FVector2D LocalPosition = MyGeometry.AbsoluteToLocal(MousePosition);
+
+			UImage* image = Cast<UImage>(GetWidgetFromName(FName("ImageIcon" + FString::FromInt(item_selected_))));
+			image->SetRenderTranslation(LocalPosition);
+		}
 	}
 }

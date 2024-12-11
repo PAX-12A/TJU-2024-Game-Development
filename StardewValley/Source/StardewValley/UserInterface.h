@@ -20,6 +20,7 @@ class STARDEWVALLEY_API UUserInterface : public UUserWidget
 	GENERATED_BODY()
 public:
 	bool Initialize() override;
+	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 public:
 	//Change the interface
 	/**
@@ -91,6 +92,27 @@ public:
 	 * \param amount The amount of the item.
 	 */
 	void RemoveItemFromBag(int32 id, int32 amount);
+	UFUNCTION()
+	/**
+	 * \brief Called when an item is selected (clicked).
+	 * 
+	 * \param id
+	 */
+	void OnItemSelected(int32 id);
+	UFUNCTION()
+	/**
+	 * \brief Called when an item is deselected (Another item is clicked).
+	 * 
+	 */
+	void OnItemDeselected();
+	UFUNCTION()
+	/**
+	 * \brief Called when a shortcut is selected (Clicked).
+	 * 
+	 * \param index
+	 */
+	void OnShortcutSelected(int32 index);
+	int32 item_selected_;
 public:
 	//Debug panel
 	UFUNCTION()
