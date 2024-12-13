@@ -12,6 +12,7 @@
 #include "WeatherSystem.h"
 #include "SceneManager.h"
 #include "UserInterface.h"
+#include "ShortcutBar.h"
 
 void UStardewValleyGameInstance::Init()
 {
