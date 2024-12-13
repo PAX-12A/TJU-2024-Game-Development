@@ -381,16 +381,23 @@ void USceneManager::GenerateItems()
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));
-	UE_LOG(LogTemp, Warning, TEXT("WidgetClass loaded"));
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 	if (WidgetClass)
 	{
 		UUserWidget* Widget = CreateWidget<UUserWidget>(GetGameInstance(), WidgetClass);
-		UE_LOG(LogTemp, Warning, TEXT("WidgetClass created"));
 
 		if (Widget)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Widget created"));
+			Widget->AddToViewport();
+		}
+	}
+	WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("WidgetBlueprint'/Game/UMG/WBP_Shortcut.WBP_Shortcut_C'"));
+	if (WidgetClass)
+	{
+		UUserWidget* Widget = CreateWidget<UUserWidget>(GetGameInstance(), WidgetClass);
+
+		if (Widget)
+		{
 			Widget->AddToViewport();
 		}
 	}
