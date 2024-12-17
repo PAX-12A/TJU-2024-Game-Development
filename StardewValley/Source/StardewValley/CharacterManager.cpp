@@ -14,7 +14,7 @@ void UCharacterManager::CharacterGenerate() {
 	UE_LOG(LogTemp, Warning, TEXT("Character Generate"));
 	UClass* AMyCharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_MyCharacter.BP_MyCharacter_C"));
 
-	FVector SpawnLocation = FVector(0.0f, 0.0f, 1000.0f);
+	FVector SpawnLocation = FVector(-230.0f, 0.0f, 230.0f);
 	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
@@ -25,12 +25,8 @@ void UCharacterManager::CharacterGenerate() {
 void UCharacterManager::Initialize(FSubsystemCollectionBase& Collection) {
 	Super::Initialize(Collection);
 	UE_LOG(LogTemp, Warning, TEXT("CharacterManager Initialize"));
-	UGameInstance* GameInstance = GetGameInstance();
-	if (GameInstance == nullptr) return;
-	UE_LOG(LogTemp, Warning, TEXT("GameInstance is not nullptr"));
-	USubsystem* EventSystem = GameInstance->GetSubsystem<UEventSystem>();
-	if (EventSystem == nullptr) return;
-	UE_LOG(LogTemp, Warning, TEXT("EventSystem is not nullptr"));
+	
+	UEventSystem* EventSystem = Collection.InitializeDependency<UEventSystem>();
 
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundGenerated.AddUObject(this, &UCharacterManager::CharacterGenerate);
+	EventSystem->OnGroundGenerated.AddUObject(this, &UCharacterManager::CharacterGenerate);
 }
