@@ -13,7 +13,7 @@
 #include "SceneManager.h"
 #include "UserInterface.h"
 #include "ShortcutBar.h"
-
+#include "CharacterManager.h"
 void UStardewValleyGameInstance::Init()
 {
 	Super::Init();
@@ -22,6 +22,7 @@ void UStardewValleyGameInstance::Init()
 	UDataSystem* DataSystem = GetSubsystem<UDataSystem>();
 	UWeatherSystem* WeatherSystem = GetSubsystem<UWeatherSystem>();
 	USceneManager* SceneManager = GetSubsystem<USceneManager>();
+	UCharacterManager* CharacterManager = GetSubsystem<UCharacterManager>();
 
 	TimeSystem->set_minute(DataSystem->get_minute());
 	TimeSystem->set_hour(DataSystem->get_hour());
