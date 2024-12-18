@@ -364,7 +364,7 @@ void USceneManager::GenerateItems()
 		/*for (int i = 55; i < 60; i++)
 			for (int j = 55; j < 60; j++)
 			{
-				CreateItemBlockByLocation(i * block_size, j * block_size, 2);
+				CreateItemBlockByLocation(i * block_size, j * block_size, 16);
 			}*/
 		for (int i = 0; i < x_length; i++)//wall
 		{
