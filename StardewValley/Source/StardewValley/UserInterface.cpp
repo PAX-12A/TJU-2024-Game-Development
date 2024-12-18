@@ -179,6 +179,7 @@ void UUserInterface::SaveGame()
 void UUserInterface::ReturnToGame()
 {
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	GetGameInstance()->GetFirstLocalPlayerController()->SetPause(false);
 	RemoveFromParent();
 }
 void UUserInterface::ReturnToTitle()

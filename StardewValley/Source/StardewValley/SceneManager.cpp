@@ -16,10 +16,12 @@
 #include "Struct_ItemBlockBase.h"
 #include "UserInterface.h"
 
+
 void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+	is_menu_exist = false;
 	UWorld* World = GetWorld();
 	if (World)
 	{
@@ -30,6 +32,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &USceneManager::ChangeSnowGroundToEarthGround);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.AddUObject(this, &USceneManager::WaterCropAtLocation);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 }
 
 void USceneManager::Deinitialize()
@@ -380,18 +383,7 @@ void USceneManager::GenerateItems()
 	}
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
-	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-	if (WidgetClass)
-	{
-		UUserWidget* Widget = CreateWidget<UUserWidget>(GetGameInstance(), WidgetClass);
-
-		if (Widget)
-		{
-			Widget->AddToViewport();
-		}
-	}
-	WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("WidgetBlueprint'/Game/UMG/WBP_Shortcut.WBP_Shortcut_C'"));
+	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("WidgetBlueprint'/Game/UMG/WBP_Shortcut.WBP_Shortcut_C'"));
 	if (WidgetClass)
 	{
 		UUserWidget* Widget = CreateWidget<UUserWidget>(GetGameInstance(), WidgetClass);
@@ -463,6 +455,23 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Interaction not accepted"));
+		}
+	}
+}
+
+void USceneManager::InvokeUIMenu()
+{
+	if (is_menu_exist)return;
+	GetGameInstance()->GetFirstLocalPlayerController()->SetPause(true);
+	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	if (WidgetClass)
+	{
+		UUserWidget* Widget = CreateWidget<UUserWidget>(GetGameInstance(), WidgetClass);
+
+		if (Widget)
+		{
+			Widget->AddToViewport();
 		}
 	}
 }
