@@ -33,6 +33,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.AddUObject(this, &USceneManager::WaterCropAtLocation);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
 }
 
 void USceneManager::Deinitialize()
@@ -474,4 +475,9 @@ void USceneManager::InvokeUIMenu()
 			Widget->AddToViewport();
 		}
 	}
+}
+
+void USceneManager::SetIsMenuExistToFalse()
+{
+	is_menu_exist = false;
 }
