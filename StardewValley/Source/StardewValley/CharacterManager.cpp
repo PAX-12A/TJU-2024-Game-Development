@@ -19,7 +19,9 @@ void UCharacterManager::CharacterGenerate() {
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
 	AMyCharacter* CharacterInstance = World->SpawnActor<AMyCharacter>(AMyCharacterClass, SpawnLocation, SpawnRotation);
-	//CharacterInstance->InitializeCharacter();
+	// Set Auto Possess Player to Player 0
+	GetWorld()->GetFirstPlayerController()->Possess(CharacterInstance);
+	//CharacterInstance->AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
 void UCharacterManager::Initialize(FSubsystemCollectionBase& Collection) {
@@ -29,4 +31,12 @@ void UCharacterManager::Initialize(FSubsystemCollectionBase& Collection) {
 	UEventSystem* EventSystem = Collection.InitializeDependency<UEventSystem>();
 
 	EventSystem->OnGroundGenerated.AddUObject(this, &UCharacterManager::CharacterGenerate);
+}
+
+void UCharacterManager::CharacterSave(){
+
+}
+
+void UCharacterManager::CharacterLoad(){
+
 }
