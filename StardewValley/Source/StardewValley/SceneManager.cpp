@@ -463,6 +463,7 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 void USceneManager::InvokeUIMenu()
 {
 	if (is_menu_exist)return;
+	else is_menu_exist = true;
 	GetGameInstance()->GetFirstLocalPlayerController()->SetPause(true);
 	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
