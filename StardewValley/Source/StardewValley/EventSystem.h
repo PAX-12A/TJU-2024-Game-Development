@@ -53,6 +53,7 @@ public:
 	FMulticastDelegateFourParams OnItemBlockAttacked;//Give it the interaction type(int32), the damage, and the position(float, float)
 	FMulticastDelegateTwoInt32Params OnGivenItems;//Give items (an int32 for the item id, an int32 for the amount) to the player(int32, int32)
 
+	FMulticastDelegate OnUIMenuClosed;//Close the UI menu
 	FMulticastDelegateOneParam OnInterfaceChanged;//Give it the interface index(int32)
 	FMulticastDelegate OnExitGame;//Exit the game
 	FMulticastDelegate OnReturnTitle;//Return to title
