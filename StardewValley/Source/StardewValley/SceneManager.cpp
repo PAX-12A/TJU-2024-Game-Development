@@ -34,6 +34,8 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockMowed.AddUObject(this, &USceneManager::ChangeGrassGroundToEarthGround);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockPloughed.AddUObject(this, &USceneManager::ChangeEarthGroundToFieldGround);
 }
 
 void USceneManager::Deinitialize()
@@ -277,7 +279,22 @@ void USceneManager::ChangeSnowGroundToEarthGround()
 			}
 		}
 }
-
+void USceneManager::ChangeEarthGroundToFieldGround(float x, float y)
+{
+	int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+	int32 x_index;
+	int32 y_index;
+	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "FieldGround");
+}
+void USceneManager::ChangeGrassGroundToEarthGround(float x, float y)
+{
+	int32 block_size = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_size();
+	int32 x_index;
+	int32 y_index;
+	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "EarthGround");
+}
 /*-----------------------------------------------Item Block-----------------------------------------*/
 void USceneManager::CreateItemBlockByLocation(float x, float y, int32 id)
 {
@@ -394,12 +411,9 @@ void USceneManager::GenerateItems()
 			Widget->AddToViewport();
 		}
 	}
-	/*CreateItemBlockByLocation(4 * block_size, 4 * block_size, 1);
-	CreateItemBlockByLocation(3 * block_size, 3 * block_size, 1);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(0 * block_size, 0 * block_size);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.Broadcast(3 * block_size, 3 * block_size);
-	UE_LOG(LogTemp, Warning, TEXT("Temperature at 57, 57 is %d"), GetGroundBlockTemperatureByLocation(57 * block_size, 57 * block_size));
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.Broadcast(2, 30, 57 * block_size, 57 * block_size);*/
+	/*GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockMowed.Broadcast(3 * block_size + block_size / 2, 3 * block_size + block_size / 2);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockMowed.Broadcast(3 * block_size + block_size / 2, 4 * block_size + block_size / 2);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockPloughed.Broadcast(3 * block_size + block_size / 2, 3 * block_size + block_size / 2);*/
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
 UClass* USceneManager::TypeToClass(FString type)//unused.

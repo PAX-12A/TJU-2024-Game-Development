@@ -18,6 +18,9 @@ UCLASS()
 class STARDEWVALLEY_API UUserInterface : public UUserWidget
 {
 	GENERATED_BODY()
+private:
+	const float kMaxExpForEachLevel = 100.0f;
+	const float kMaxLevel = 10.0f;
 public:
 	bool Initialize() override;
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;

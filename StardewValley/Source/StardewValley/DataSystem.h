@@ -1,7 +1,7 @@
 /****************************************************************
  * \file   DataSystem.h
  * \brief  Data system is a system to store all the data necessary.
- * 
+ *
  * \author 4_of_Diamonds
  * \date   November 2024
  *********************************************************************/
@@ -14,9 +14,9 @@
 #include "ItemBlockBase.h"
 #include "DataSystem.generated.h"
 
-/**
- * 
- */
+ /**
+  *
+  */
 UCLASS()
 class STARDEWVALLEY_API UDataSystem : public UGameInstanceSubsystem
 {
@@ -49,7 +49,15 @@ private:
 	//Weather data
 	int32 present_weather_;
 	int32 present_base_temperature_;
-
+private:
+	//Player data
+	int32 player_axe_level_;
+	int32 player_hoe_level_;
+	int32 player_scythe_level_;
+	int32 player_axe_exp_;
+	int32 player_hoe_exp_;
+	int32 player_scythe_exp_;
+	TMap<int32, int32> player_bag_;
 	/*-----------------------------Getters-----------------------------*/
 public:
 	//Time data getters
@@ -63,10 +71,10 @@ public:
 	int32 get_ground_block_size() { return ground_block_size_; };
 	int32 get_ground_block_x_length() { return ground_block_x_length_; };
 	int32 get_ground_block_y_length() { return ground_block_y_length_; };
-	FString get_ground_block_type(int32 index) { if(index < ground_block_type_.Num() && index >= 0)return ground_block_type_[index];else return ""; };
-	FString get_ground_block_type(int32 x, int32 y) { if(x * ground_block_y_length_ + y < ground_block_type_.Num() && x * ground_block_y_length_ + y >= 0)return ground_block_type_[x * ground_block_y_length_ + y];else return ""; };
-	int32 get_ground_block_delta_temperature(int32 index) { if(index < ground_block_delta_temperature_.Num() && index >= 0)return ground_block_delta_temperature_[index];else return 0; };
-	int32 get_ground_block_delta_temperature(int32 x, int32 y) { if(x * ground_block_y_length_ + y < ground_block_delta_temperature_.Num() && x * ground_block_y_length_ + y >= 0)return ground_block_delta_temperature_[x * ground_block_y_length_ + y];else return 0; };
+	FString get_ground_block_type(int32 index) { if (index < ground_block_type_.Num() && index >= 0)return ground_block_type_[index]; else return ""; };
+	FString get_ground_block_type(int32 x, int32 y) { if (x * ground_block_y_length_ + y < ground_block_type_.Num() && x * ground_block_y_length_ + y >= 0)return ground_block_type_[x * ground_block_y_length_ + y]; else return ""; };
+	int32 get_ground_block_delta_temperature(int32 index) { if (index < ground_block_delta_temperature_.Num() && index >= 0)return ground_block_delta_temperature_[index]; else return 0; };
+	int32 get_ground_block_delta_temperature(int32 x, int32 y) { if (x * ground_block_y_length_ + y < ground_block_delta_temperature_.Num() && x * ground_block_y_length_ + y >= 0)return ground_block_delta_temperature_[x * ground_block_y_length_ + y]; else return 0; };
 	AGroundBlockBase* get_ground_block(int32 index) { if (index < ground_blocks_.Num() && index >= 0)return ground_blocks_[index]; else return nullptr; };
 	AGroundBlockBase* get_ground_block(int32 x, int32 y) { if (x * ground_block_y_length_ + y < ground_blocks_.Num() && x * ground_block_y_length_ + y >= 0)return ground_blocks_[x * ground_block_y_length_ + y]; else return nullptr; };
 public:
@@ -86,7 +94,16 @@ public:
 	//Weather data getters
 	int32 get_present_weather() { return present_weather_; };
 	int32 get_present_base_temperature() { return present_base_temperature_; };
-
+public:
+	//Player data getters
+	int32 get_player_axe_level() { return player_axe_level_; };
+	int32 get_player_hoe_level() { return player_hoe_level_; };
+	int32 get_player_scythe_level() { return player_scythe_level_; };
+	int32 get_player_axe_exp() { return player_axe_exp_; };
+	int32 get_player_hoe_exp() { return player_hoe_exp_; };
+	int32 get_player_scythe_exp() { return player_scythe_exp_; };
+	int32 get_amount_of_item_in_bag(int32 index) { if (player_bag_.Contains(index))return player_bag_[index]; else return 0; };
+	TMap<int32, int32> get_player_bag() { return player_bag_; };
 	/*-----------------------------Setters-----------------------------*/
 public:
 	//Time data setters
@@ -123,7 +140,18 @@ public:
 	void set_is_item_block_watered(int32 index, bool is_watered) { while (is_item_block_watered_.Num() <= index) { is_item_block_watered_.Add(false); }; is_item_block_watered_[index] = is_watered; };
 	void set_is_item_block_watered(int32 x, int32 y, bool is_watered) { set_is_item_block_watered(x * ground_block_y_length_ + y, is_watered); };
 	void set_is_items_initialized(bool is_initialized) { is_items_initialized_ = is_initialized; };
-
+public:
+	//Player data setters
+	void set_player_axe_level(int32 level) { player_axe_level_ = level; };
+	void set_player_hoe_level(int32 level) { player_hoe_level_ = level; };
+	void set_player_scythe_level(int32 level) { player_scythe_level_ = level; };
+	void set_player_axe_exp(int32 exp) { player_axe_exp_ = exp; };
+	void set_player_hoe_exp(int32 exp) { player_hoe_exp_ = exp; };
+	void set_player_scythe_exp(int32 exp) { player_scythe_exp_ = exp; };
+	void add_item_to_bag(int32 id, int32 amount) {
+		if (player_bag_.Contains(id)) { player_bag_[id] += amount; }
+		else { player_bag_.Add(id, amount); };
+	}
 	/*-----------------------------Others-----------------------------*/
 public:
 	//Other functions
@@ -131,12 +159,12 @@ public:
 	void Deinitialize() override;
 	/**
 	 * Saves the game.
-	 * 
+	 *
 	 */
 	void SaveGame();
 	/**
 	 * Loads the game.
-	 * 
+	 *
 	 */
 	void LoadGame();
 };

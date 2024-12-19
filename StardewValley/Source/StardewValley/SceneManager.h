@@ -84,6 +84,20 @@ public:
 	 * 
 	 */
 	void ChangeSnowGroundToEarthGround();
+	/**
+	 * \brief Change earth ground at the given location to field ground.
+	 * 
+	 * \param x The x location of the ground block
+	 * \param y The y location of the ground block
+	 */
+	void ChangeEarthGroundToFieldGround(float x, float y);
+	/**
+	 * \brief Change grass ground at the given location to earth ground.
+	 * 
+	 * \param x The x location of the ground block
+	 * \param y The y location of the ground block
+	 */
+	void ChangeGrassGroundToEarthGround(float x, float y);
 
 	//Item Blocks
 	/**

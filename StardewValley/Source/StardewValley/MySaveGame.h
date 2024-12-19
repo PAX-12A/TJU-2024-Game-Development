@@ -53,4 +53,18 @@ public:
 	TArray<bool> is_item_block_watered_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	int32 real_time_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 player_axe_level_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 player_hoe_level_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 player_scythe_level_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 player_axe_exp_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 player_hoe_exp_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	int32 player_scythe_exp_;
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TMap<int32, int32> player_bag_;
 };
