@@ -65,6 +65,16 @@ void UDataSystem::SaveGame()
 		{
 			SaveGameInstance->item_block_id_.Add(item_block_id_[i]);
 		}
+		SaveGameInstance->player_axe_level_ = player_axe_level_;
+		SaveGameInstance->player_hoe_level_ = player_hoe_level_;
+		SaveGameInstance->player_scythe_level_ = player_scythe_level_;
+		SaveGameInstance->player_axe_exp_ = player_axe_exp_;
+		SaveGameInstance->player_hoe_exp_ = player_hoe_exp_;
+		SaveGameInstance->player_scythe_exp_ = player_scythe_exp_;
+		for (auto it : player_bag_)//Player system data saved
+		{
+			SaveGameInstance->player_bag_.Add(it);
+		}
 
 		// Save the data to a file
 		bool bSuccess = UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("SavedGame"), 0);
@@ -116,6 +126,16 @@ void UDataSystem::LoadGame()
 		for (int i = 0; i < LoadedGame->item_block_id_.Num(); i++)// Item block data loaded
 		{
 			set_item_block_id(i, LoadedGame->item_block_id_[i]);
+		}
+		set_player_axe_level(LoadedGame->player_axe_level_);
+		set_player_hoe_level(LoadedGame->player_hoe_level_);
+		set_player_scythe_level(LoadedGame->player_scythe_level_);
+		set_player_axe_exp(LoadedGame->player_axe_exp_);
+		set_player_hoe_exp(LoadedGame->player_hoe_exp_);
+		set_player_scythe_exp(LoadedGame->player_scythe_exp_);
+		for (auto it : LoadedGame->player_bag_)// Player system data loaded
+		{
+			player_bag_.Add(it);
 		}
 	}
 }

@@ -109,9 +109,12 @@ bool UUserInterface::Initialize()
 	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
 	UProgressBar* BarScytheSkill = Cast<UProgressBar>(GetWidgetFromName("BarScytheSkill"));
 	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
-	/// Initial data of ProgressBar should be set here.
-	/// Initial data of ProgressBar should be set here.
-	/// Initial data of ProgressBar should be set here.
+	SetProgressBarValue(BarAexExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_exp()) / kMaxExpForEachLevel);
+	SetProgressBarValue(BarHoeExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_exp()) / kMaxExpForEachLevel);
+	SetProgressBarValue(BarScytheExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_exp()) / kMaxExpForEachLevel);
+	SetProgressBarValue(BarAexSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level()) / kMaxLevel);
+	SetProgressBarValue(BarHoeSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level()) / kMaxLevel);
+	SetProgressBarValue(BarScytheSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level()) / kMaxLevel);
 	UButton* BtnAexUp = Cast<UButton>(GetWidgetFromName("BtnAexUp"));
 	UButton* BtnHoeUp = Cast<UButton>(GetWidgetFromName("BtnHoeUp"));
 	UButton* BtnScytheUp = Cast<UButton>(GetWidgetFromName("BtnScytheUp"));
@@ -148,6 +151,11 @@ bool UUserInterface::Initialize()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Button %s not found or is nullptr"), *ButtonName);
 		}
+	}
+	for (auto item : GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag())
+	{
+		AddItemToBag(item.Key, item.Value);
+		GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(item.Key, -1 * item.Value);
 	}
 
 	/*--------------------------------Debug Panel---------------------------------*/
@@ -205,11 +213,26 @@ void UUserInterface::IncreaseProgressBarValue(UProgressBar* bar, float value)
 			bar->SetPercent((new_value = value + current_value));
 		if (fabs(new_value - 1.0f) < KINDA_SMALL_NUMBER)//If the progress bar is almost full, set the progress bar to 1.0f directly, otherwise the progress bar will be displayed as 1.0f-0.0001f, which will cause the progress bar to jump back and forth.
 		{
+			new_value = 1.0f;
 			bar->SetPercent(1.0f);
 			if (bar->GetName() == "BarAexExp" || bar->GetName() == "BarHoeExp" || bar->GetName() == "BarScytheExp")//Exp Bar
 			{
 				GetGameInstance()->GetSubsystem<UEventSystem>()->OnAnExpBarFull.Broadcast();
 			}
+		}
+		
+		//Update data system
+		if (bar->GetName() == "BarAexExp")
+		{
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_axe_exp(static_cast<int32>(new_value * kMaxExpForEachLevel));
+		}
+		else if (bar->GetName() == "BarHoeExp")
+		{
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_hoe_exp(static_cast<int32>(new_value * kMaxExpForEachLevel));
+		}
+		else if (bar->GetName() == "BarScytheExp")
+		{
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_scythe_exp(static_cast<int32>(new_value * kMaxExpForEachLevel));
 		}
 	}
 }
@@ -261,6 +284,10 @@ void UUserInterface::AxeLevelUp()
 	IncreaseProgressBarValue(BarAexSkill, 0.1f);
 	SetProgressBarValue(BarAexExp, 0.0f);
 	BtnAexUp->SetIsEnabled(false);
+
+	//Update data system
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_axe_level(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level() + 1);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_axe_exp(0);
 }
 void UUserInterface::HoeLevelUp()
 {
@@ -270,6 +297,10 @@ void UUserInterface::HoeLevelUp()
 	IncreaseProgressBarValue(BarHoeSkill, 0.1f);
 	SetProgressBarValue(BarHoeExp, 0.0f);
 	BtnHoeUp->SetIsEnabled(false);
+
+	//Update data system
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_hoe_level(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level() + 1);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_hoe_exp(0);
 }
 void UUserInterface::ScytheLevelUp()
 {
@@ -279,14 +310,21 @@ void UUserInterface::ScytheLevelUp()
 	IncreaseProgressBarValue(BarScytheSkill, 0.1f);
 	SetProgressBarValue(BarScytheExp, 0.0f);
 	BtnScytheUp->SetIsEnabled(false);
+
+	//Update data system
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_scythe_level(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level() + 1);
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_scythe_exp(0);
 }
 void UUserInterface::DEBUGGER()
 {
 	for (int32 i = 0; i < 66; i++)
 		AddItemToBag(i, 1);
+	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
+	IncreaseProgressBarValue(BarAexExp, 0.2f);
 }
 void UUserInterface::AddItemToBag(int32 id, int32 amount)
 {
+	GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(id, amount);
 	if (ItemsInBag.Contains(id))//If the item is already in the bag, increase the amount of the item in the bag
 	{
 		ItemsInBag[id] += amount;

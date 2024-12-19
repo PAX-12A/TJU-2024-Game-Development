@@ -47,8 +47,10 @@ public:
 	FMulticastDelegate OnBaseTemperatureChanged;
 
 	FMulticastDelegate OnGroundGenerated;
+	FMulticastDelegateTwoParams OnGroundBlockMowed;//Give it the position(float, float)
+	FMulticastDelegateTwoParams OnGroundBlockPloughed;//Give it the position(float, float)
 
-	FMulticastDelegateTwoParams WaterCropAtGivenPosition;
+	FMulticastDelegateTwoParams WaterCropAtGivenPosition;//Give it the position(float, float)
 
 	FMulticastDelegateFourParams OnItemBlockAttacked;//Give it the interaction type(int32), the damage, and the position(float, float)
 	FMulticastDelegateTwoInt32Params OnGivenItems;//Give items (an int32 for the item id, an int32 for the amount) to the player(int32, int32)
