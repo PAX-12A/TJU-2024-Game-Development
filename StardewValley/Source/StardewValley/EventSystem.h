@@ -14,6 +14,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FMulticastDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FMulticastDelegateOneParam, int32);
+
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoParams, float, float);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoInt32Params, int32, int32);
 DECLARE_MULTICAST_DELEGATE_FourParams(FMulticastDelegateFourParams, int32, int32, float, float);
@@ -63,4 +64,9 @@ public:
 
 	//Character Part
 	FMulticastDelegate OnCallingMenu;//Call the menu
+	/*
+	FMulticastDelegate OnCharacterMenuClosed;//Close the character menu
+	FMulticastDelegate OnCharacterMenuOpened;//Open the character menu
+	*/
+	FMulticastDelegateOneParam OnToolUsed;//Use the tool
 };
