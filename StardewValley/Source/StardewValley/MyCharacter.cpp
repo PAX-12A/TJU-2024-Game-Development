@@ -87,77 +87,91 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AMyCharacter::MoveY(float Value)
 {
-	AddMovementInput(GetActorForwardVector(), Value);
+	AddMovementInput(GetActorForwardVector(), 1.5 * Value);
 }
 
 void AMyCharacter::MoveX(float Value)
 {
-	AddMovementInput(GetActorRightVector(), Value);
+	AddMovementInput(GetActorRightVector(), 1.5 * Value);
 }
 
 void AMyCharacter::MoveUp(float Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("MoveUp"));
-	SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, Value)); //Move UpLocation
-	//AddMovementInput(GetActorUpVector(), Value);
+	SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 2 * Value)); //Move UpLocation
 }
 
 void AMyCharacter::CharacterEquipTool1() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool1"));
 	now_tool = 1;
 }
 void AMyCharacter::CharacterEquipTool2() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool2"));
 	now_tool = 2;
 }
 void AMyCharacter::CharacterEquipTool3() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool3"));
 	now_tool = 3;
 }
 void AMyCharacter::CharacterEquipTool4() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool4"));
 	now_tool = 4;
 }
 void AMyCharacter::CharacterEquipTool5() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool5"));
 	now_tool = 5;
 }
 void AMyCharacter::CharacterEquipTool6() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool6"));
 	now_tool = 6;
 }
 void AMyCharacter::CharacterEquipTool7() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool7"));
 	now_tool = 7;
 }
 void AMyCharacter::CharacterEquipTool8() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool8"));
 	now_tool = 8;
 }
 void AMyCharacter::CharacterEquipTool9() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool9"));
 	now_tool = 9;
 }
 void AMyCharacter::CharacterEquipTool10() {
+	UE_LOG(LogTemp, Warning, TEXT("Equip Tool10"));
 	now_tool = 10;
 }
 
 void AMyCharacter::CharacterToolsUse() {
-
+	UE_LOG(LogTemp, Warning, TEXT("CharacterUseTools"));
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolUsed.Broadcast(now_tool);
 }
 
-//kan fa
+//Cut Down Object
 void AMyCharacter::UseSkill1() {
-
+	UE_LOG(LogTemp, Warning, TEXT("UsingSkill1"));
 }
-//kai cai
+
+//Exploit
 void AMyCharacter::UseSkill2() {
-
+	UE_LOG(LogTemp, Warning, TEXT("UsingSkill2"));
 }
-//chu di
+
+//Hoe Ground
 void AMyCharacter::UseSkill3() {
-
+	UE_LOG(LogTemp, Warning, TEXT("UsingSkill3"));
 }
-//ge cao
-void AMyCharacter::UseSkill4() {
 
+//Mow
+void AMyCharacter::UseSkill4() {
+	UE_LOG(LogTemp, Warning, TEXT("UsingSkill4"));
 }
 
 void AMyCharacter::CallMenu() {
 	UE_LOG(LogTemp, Warning, TEXT("Call Menu"));
+	CharacterLocationUpdate();
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.Broadcast();
 }
+
 /*
 void AMyCharacter::SkillLevelUpdate(int32 skill_experience, int32 skill_type) {
 	for (int32 i = skill_level[skill_type]; i <= 19; i++) {

@@ -14,14 +14,14 @@ void UCharacterManager::CharacterGenerate() {
 	UE_LOG(LogTemp, Warning, TEXT("Character Generate"));
 	UClass* AMyCharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_MyCharacter.BP_MyCharacter_C"));
 
-	FVector SpawnLocation = FVector(-230.0f, 0.0f, 230.0f);
+	FVector SpawnLocation = FVector(1000.0f, 5500.0f, 1000.0f);
 	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
 	AMyCharacter* CharacterInstance = World->SpawnActor<AMyCharacter>(AMyCharacterClass, SpawnLocation, SpawnRotation);
+
 	// Set Auto Possess Player to Player 0
 	GetWorld()->GetFirstPlayerController()->Possess(CharacterInstance);
-	//CharacterInstance->AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
 void UCharacterManager::Initialize(FSubsystemCollectionBase& Collection) {
