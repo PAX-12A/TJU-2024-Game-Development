@@ -65,7 +65,10 @@ private:
 	void CharacterEquipTool8();
 	void CharacterEquipTool9();
 	void CharacterEquipTool10();
-	void CharacterToolsUse();
+
+	void MouseClick();
+
+	void CharacterToolsUse(FVector Location);
 
 	void UseSkill1();
 	void UseSkill2();

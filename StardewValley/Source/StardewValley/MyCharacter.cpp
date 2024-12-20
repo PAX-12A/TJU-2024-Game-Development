@@ -92,6 +92,9 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(FName("Equip9"), IE_Pressed, this, &AMyCharacter::CharacterEquipTool9);
 	PlayerInputComponent->BindAction(FName("Equip10"), IE_Pressed, this, &AMyCharacter::CharacterEquipTool10);
 
+	//Bind Mouse Click
+	PlayerInputComponent->BindAction(FName("Click"), IE_Pressed, this, &AMyCharacter::MouseClick);
+
 	//Bind Skill Functions
 	PlayerInputComponent->BindAction(FName("Skill1"), IE_Pressed, this, &AMyCharacter::UseSkill1);
 	PlayerInputComponent->BindAction(FName("Skill2"), IE_Pressed, this, &AMyCharacter::UseSkill2);
@@ -119,48 +122,95 @@ void AMyCharacter::MoveUp(float Value)
 void AMyCharacter::CharacterEquipTool1() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool1"));
 	now_tool_ = 1;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool2() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool2"));
 	now_tool_ = 2;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool3() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool3"));
 	now_tool_ = 3;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool4() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool4"));
 	now_tool_ = 4;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool5() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool5"));
 	now_tool_ = 5;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool6() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool6"));
 	now_tool_ = 6;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool7() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool7"));
 	now_tool_ = 7;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool8() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool8"));
 	now_tool_ = 8;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool9() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool9"));
 	now_tool_ = 9;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 void AMyCharacter::CharacterEquipTool10() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool10"));
 	now_tool_ = 10;
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEquipTool.Broadcast(now_tool_);
 }
 
-void AMyCharacter::CharacterToolsUse() {
-	UE_LOG(LogTemp, Warning, TEXT("CharacterUseTools"));
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolUsed.Broadcast(now_tool_);
+void AMyCharacter::MouseClick() {
+	UE_LOG(LogTemp, Warning, TEXT("Mouse Click"));
+	CharacterLocationUpdate();
+	UE_LOG(LogTemp, Warning, TEXT("Character Location: %f, %f, %f"), CharacterLocation.X, CharacterLocation.Y, CharacterLocation.Z);
 
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController)
+	{
+		FVector HitLocation;
+		FVector HitNormal;
+		FHitResult Hit;
+		if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, Hit))
+		{
+			HitLocation = Hit.Location;
+			//Use Tools
+			CharacterToolsUse(HitLocation);
+		}
+	}
+}
+
+void AMyCharacter::CharacterToolsUse(FVector Location) {
+	UE_LOG(LogTemp, Warning, TEXT("Hit Location: %f, %f, %f"), Location.X, Location.Y, Location.Z);
+	UE_LOG(LogTemp, Warning, TEXT("CharacterUseTools"));
+
+	int32 now_tool_id = now_tool_;//now_tool_id is the exact type of the tool
+	//now_tool_ = GetGameInstance()->GetSubsystem<UDataSystem>()->get_tools_id(now_tool_);
+	float now_tool_range = 200.0f;
+	//now_tool_range = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_tool_range(now_tool_);
+	float skill_add_range = 100.0f;
+	//skill_add_range = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_skill_add_range(now_tool_);
+	float permit_range = now_tool_range + skill_add_range;
+	float distance = sqrt(pow(Location.X - CharacterLocation.X, 2) + pow(Location.Y - CharacterLocation.Y, 2));
+	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distance);
+	if (fabs(permit_range - distance) > KINDA_SMALL_NUMBER) {
+		//if (now_tool_id == 1)//tool is scythe
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.Broadcast(Location.X, Location.Y);
+		//if (now_tool_id == 2)//tool is hoe
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnPloughingEarthGround.Broadcast(Location.X, Location.Y);
+		//else
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolsTowardsItemBlock.Broadcast(now_tool_id, Location.X, Location.Y);
+	}
 }
 
 //Cut Down Object(Use axe)
