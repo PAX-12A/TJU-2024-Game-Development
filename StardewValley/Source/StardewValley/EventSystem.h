@@ -48,8 +48,8 @@ public:
 	FMulticastDelegate OnBaseTemperatureChanged;
 
 	FMulticastDelegate OnGroundGenerated;
-	FMulticastDelegateTwoParams OnGroundBlockMowed;//Give it the position(float, float)
-	FMulticastDelegateTwoParams OnGroundBlockPloughed;//Give it the position(float, float)
+	FMulticastDelegate OnGrassGroundMowed;
+	FMulticastDelegate OnEarthGroundPloughed;
 
 	FMulticastDelegateTwoParams WaterCropAtGivenPosition;//Give it the position(float, float)
 
