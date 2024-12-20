@@ -34,8 +34,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockMowed.AddUObject(this, &USceneManager::ChangeGrassGroundToEarthGround);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockPloughed.AddUObject(this, &USceneManager::ChangeEarthGroundToFieldGround);
+	
 }
 
 void USceneManager::Deinitialize()
@@ -285,7 +284,11 @@ void USceneManager::ChangeEarthGroundToFieldGround(float x, float y)
 	int32 x_index;
 	int32 y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
-	CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "FieldGround");
+	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(x_index, y_index) == "EarthGround")
+	{
+		CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "FieldGround");
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnEarthGroundPloughed.Broadcast();
+	}
 }
 void USceneManager::ChangeGrassGroundToEarthGround(float x, float y)
 {
@@ -293,7 +296,11 @@ void USceneManager::ChangeGrassGroundToEarthGround(float x, float y)
 	int32 x_index;
 	int32 y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
-	CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "EarthGround");
+	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(x_index, y_index) == "GrassGround")
+	{
+		CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "EarthGround");
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnGrassGroundMowed.Broadcast();
+	}
 }
 /*-----------------------------------------------Item Block-----------------------------------------*/
 void USceneManager::CreateItemBlockByLocation(float x, float y, int32 id)
