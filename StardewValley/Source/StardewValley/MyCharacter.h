@@ -10,7 +10,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "TimerManager.h"
 #include "EventSystem.h"
+#include "DataSystem.h"
 #include "MyCharacter.generated.h"
 
 const static int32 experience_table[20] = { 0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900 };
@@ -68,17 +70,36 @@ private:
 	void UseSkill1();
 	void UseSkill2();
 	void UseSkill3();
-	void UseSkill4();
 
 	void CallMenu();
 	//void SkillLevelUpdate(int32 skill_experience,int32 skill_type);
 
 	void CharacterLocationUpdate();
 
-	int32 now_tool;
+	int32 now_tool_;
 
-	UPROPERTY(VisibleAnywhere)
-	int32 skill_level[4];
+	float default_axe_range_ = 200.0f;
+	float default_hoe_range_ = 200.0f;
+	float default_scythe_range_ = 200.0f;
+	float axe_range_;
+	float hoe_range_;
+	float scythe_range_;
+
+	float axe_cool_down_duration = 5.0f;
+	float hoe_cool_down_duration = 5.0f;
+	float scythe_cool_down_duration = 5.0f;
+
+	FTimerHandle AxeTimerHandle;
+	FTimerHandle HoeTimerHandle;
+	FTimerHandle ScytheTimerHandle;
+	
+	bool bIsAxeCoolDown = false;
+	bool bIsHoeCoolDown = false;
+	bool bIsScytheCoolDown = false;
+
+	void AxeEndCoolDown();
+	void HoeEndCoolDown();
+	void ScytheEndCoolDown();
 
 	UPROPERTY(VisibleAnywhere)
 	FVector CharacterLocation;
