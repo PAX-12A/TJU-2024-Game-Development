@@ -14,7 +14,8 @@ bool UShortcutBar::Initialize()
 		return false;
 	}
 
-	active_item_index_ = 1;
+	active_item_index_ = 2;
+	HighLightActiveItem(1);
 	auto GameInstance = GetGameInstance();
 	if (GameInstance != nullptr)
 	{
@@ -72,7 +73,6 @@ void UShortcutBar::RemoveItemFromShortcutBar(int32 index)
 }
 void UShortcutBar::HighLightActiveItem(int32 index)
 {
-	UE_LOG(LogTemp, Warning, TEXT("index = %d"), index);
 	if (index == active_item_index_) return;
 	FName name = FName("ImgShortcut_" + FString::FromInt(index));
 	FName old_name = FName("ImgShortcut_" + FString::FromInt(active_item_index_));
