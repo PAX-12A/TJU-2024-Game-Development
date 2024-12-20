@@ -13,6 +13,7 @@
 #include "Camera\CameraComponent.h"
 #include "Components\InputComponent.h"
 #include "Components\StaticMeshComponent.h"
+
 // Sets default values
 AMyCharacter::AMyCharacter()
 {
@@ -43,6 +44,22 @@ AMyCharacter::AMyCharacter()
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController)
+	{
+		//Show Mouse
+		PlayerController->bShowMouseCursor = true;
+
+		//permit click
+		PlayerController->bEnableClickEvents = true;
+
+		//Permit Mouse Over
+		PlayerController->bEnableMouseOverEvents = true;
+
+		//Unlock Mouse
+		PlayerController->SetInputMode(FInputModeGameAndUI().SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock));
+	}
 }
 
 // Called every frame
@@ -79,7 +96,6 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(FName("Skill1"), IE_Pressed, this, &AMyCharacter::UseSkill1);
 	PlayerInputComponent->BindAction(FName("Skill2"), IE_Pressed, this, &AMyCharacter::UseSkill2);
 	PlayerInputComponent->BindAction(FName("Skill3"), IE_Pressed, this, &AMyCharacter::UseSkill3);
-	PlayerInputComponent->BindAction(FName("Skill4"), IE_Pressed, this, &AMyCharacter::UseSkill4);
 
 	//Call the Menu
 	PlayerInputComponent->BindAction(FName("Menu"), IE_Pressed, this, &AMyCharacter::CallMenu);
@@ -97,73 +113,110 @@ void AMyCharacter::MoveX(float Value)
 
 void AMyCharacter::MoveUp(float Value)
 {
-	SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 2 * Value)); //Move UpLocation
+	SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, Value)); //Move UpLocation
 }
 
 void AMyCharacter::CharacterEquipTool1() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool1"));
-	now_tool = 1;
+	now_tool_ = 1;
 }
 void AMyCharacter::CharacterEquipTool2() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool2"));
-	now_tool = 2;
+	now_tool_ = 2;
 }
 void AMyCharacter::CharacterEquipTool3() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool3"));
-	now_tool = 3;
+	now_tool_ = 3;
 }
 void AMyCharacter::CharacterEquipTool4() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool4"));
-	now_tool = 4;
+	now_tool_ = 4;
 }
 void AMyCharacter::CharacterEquipTool5() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool5"));
-	now_tool = 5;
+	now_tool_ = 5;
 }
 void AMyCharacter::CharacterEquipTool6() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool6"));
-	now_tool = 6;
+	now_tool_ = 6;
 }
 void AMyCharacter::CharacterEquipTool7() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool7"));
-	now_tool = 7;
+	now_tool_ = 7;
 }
 void AMyCharacter::CharacterEquipTool8() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool8"));
-	now_tool = 8;
+	now_tool_ = 8;
 }
 void AMyCharacter::CharacterEquipTool9() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool9"));
-	now_tool = 9;
+	now_tool_ = 9;
 }
 void AMyCharacter::CharacterEquipTool10() {
 	UE_LOG(LogTemp, Warning, TEXT("Equip Tool10"));
-	now_tool = 10;
+	now_tool_ = 10;
 }
 
 void AMyCharacter::CharacterToolsUse() {
 	UE_LOG(LogTemp, Warning, TEXT("CharacterUseTools"));
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolUsed.Broadcast(now_tool);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolUsed.Broadcast(now_tool_);
+
 }
 
-//Cut Down Object
+//Cut Down Object(Use axe)
 void AMyCharacter::UseSkill1() {
+	if (bIsAxeCoolDown) {
+		UE_LOG(LogTemp, Warning, TEXT("Skill1 is not cooling down"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("UsingSkill1"));
+	int32 axe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level();
+	bIsAxeCoolDown = true;
+	axe_range_ = axe_level * 50.f + default_axe_range_;
+	GetWorldTimerManager().SetTimer(AxeTimerHandle, this, &AMyCharacter::AxeEndCoolDown, axe_cool_down_duration);
 }
-
-//Exploit
+//Hoe Ground(Use hoe)
 void AMyCharacter::UseSkill2() {
+	if (bIsHoeCoolDown) {
+		UE_LOG(LogTemp, Warning, TEXT("Skill2 is not cooling down"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("UsingSkill2"));
+	int32 hoe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level();
+	bIsHoeCoolDown = true;
+	hoe_range_ = hoe_level * 50.f + default_hoe_range_;
+	GetWorldTimerManager().SetTimer(HoeTimerHandle, this, &AMyCharacter::HoeEndCoolDown, hoe_cool_down_duration);
 }
 
-//Hoe Ground
+//Mow(Use scythe)
 void AMyCharacter::UseSkill3() {
+	if (bIsScytheCoolDown) {
+		UE_LOG(LogTemp, Warning, TEXT("Skill3 is not cooling down"));
+		return;
+	}
 	UE_LOG(LogTemp, Warning, TEXT("UsingSkill3"));
+	int32 scythe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level();
+	bIsScytheCoolDown = true;
+	scythe_range_ = scythe_level * 50.f + default_scythe_range_;
+	GetWorldTimerManager().SetTimer(ScytheTimerHandle, this, &AMyCharacter::ScytheEndCoolDown, scythe_cool_down_duration);
 }
 
-//Mow
-void AMyCharacter::UseSkill4() {
-	UE_LOG(LogTemp, Warning, TEXT("UsingSkill4"));
+void AMyCharacter::AxeEndCoolDown() {
+	bIsAxeCoolDown = false;
+	axe_range_ = default_axe_range_;
+	GetWorldTimerManager().ClearTimer(AxeTimerHandle);
+}
+
+void AMyCharacter::HoeEndCoolDown() {
+	bIsHoeCoolDown = false;
+	hoe_range_ = default_hoe_range_;
+	GetWorldTimerManager().ClearTimer(HoeTimerHandle);
+}
+
+void AMyCharacter::ScytheEndCoolDown() {
+	bIsScytheCoolDown = false;
+	scythe_range_ = default_scythe_range_;
+	GetWorldTimerManager().ClearTimer(ScytheTimerHandle);
 }
 
 void AMyCharacter::CallMenu() {
@@ -171,17 +224,6 @@ void AMyCharacter::CallMenu() {
 	CharacterLocationUpdate();
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.Broadcast();
 }
-
-/*
-void AMyCharacter::SkillLevelUpdate(int32 skill_experience, int32 skill_type) {
-	for (int32 i = skill_level[skill_type]; i <= 19; i++) {
-		if (skill_experience >= experience_table[i]) {
-			skill_level[skill_type]++;
-			skill_experience -= experience_table[i];
-		}
-	}
-}
-*/
 
 void AMyCharacter::CharacterLocationUpdate() {
 	CharacterLocation = this->GetActorLocation();
