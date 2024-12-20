@@ -13,6 +13,8 @@ UCLASS()
 class STARDEWVALLEY_API UShortcutBar : public UUserWidget
 {
 	GENERATED_BODY()
+private:
+	int32 active_item_index_;
 public:
 	bool Initialize() override;
 public:
@@ -20,4 +22,10 @@ public:
 	void AddItemToShortcutBar(int32 id, int32 index);
 	UFUNCTION()
 	void RemoveItemFromShortcutBar(int32 index);
+	/**
+	 * Highlights the active item.
+	 * 
+	 * \param index The index of the active item
+	 */
+	void HighLightActiveItem(int32 index);
 };
