@@ -25,6 +25,7 @@
 #include "Struct_ItemBase.h"
 #include "Engine/StreamableManager.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "EventSystem.h"
 #include "DataSystem.h"
 
@@ -79,7 +80,7 @@ bool UUserInterface::Initialize()
 	UButton* BtnExit = Cast<UButton>(GetWidgetFromName("BtnExit"));
 	UButton* BtnSaveGame = Cast<UButton>(GetWidgetFromName("BtnSaveGame"));
 	UButton* BtnReturnToGame = Cast<UButton>(GetWidgetFromName("BtnReturnToGame"));
-	UButton* BtnReturnTitle = Cast<UButton>(GetWidgetFromName("BtnReturnTitle"));
+	UButton* BtnGoodbyeWorld = Cast<UButton>(GetWidgetFromName("BtnGoodbyeWorld"));
 	UButton* BtnOptioin = Cast<UButton>(GetWidgetFromName("BtnOption"));
 	if (BtnExit != nullptr)
 	{
@@ -93,9 +94,9 @@ bool UUserInterface::Initialize()
 	{
 		BtnReturnToGame->OnClicked.AddDynamic(this, &UUserInterface::ReturnToGame);
 	}
-	if (BtnReturnTitle != nullptr)
+	if (BtnGoodbyeWorld != nullptr)
 	{
-		BtnReturnTitle->OnClicked.AddDynamic(this, &UUserInterface::ReturnToTitle);
+		BtnGoodbyeWorld->OnClicked.AddDynamic(this, &UUserInterface::GoodbyeWorld);
 	}
 	if (BtnOptioin != nullptr)
 	{
@@ -228,9 +229,28 @@ void UUserInterface::ReturnToGame()
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.Broadcast();
 	RemoveFromParent();
 }
-void UUserInterface::ReturnToTitle()
+void UUserInterface::GoodbyeWorld()
 {
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnReturnTitle.Broadcast();
+	auto GetSaveGameFilePath = [](const FString& SlotName) -> FString
+		{
+			FString SaveDirectory = FPaths::ProjectSavedDir() / TEXT("SaveGames");
+
+			FString SaveGameFileName = SlotName + TEXT(".sav");
+			FString SaveGameFilePath = SaveDirectory / SaveGameFileName;
+
+			return SaveGameFilePath;
+		};
+	FString SaveGameFilePath = GetSaveGameFilePath("SavedGame");
+	UE_LOG(LogTemp, Warning, TEXT("address : %s"), *SaveGameFilePath);
+
+	if (IFileManager::Get().FileExists(*SaveGameFilePath))
+	{
+		bool bSuccess = IFileManager::Get().Delete(*SaveGameFilePath);
+		UE_LOG(LogTemp, Warning, TEXT("Delete : %d"), bSuccess);
+	}
+	GetGameInstance()->GetSubsystem<UDataSystem>()->do_save = false;
+	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, true);
 }
 void UUserInterface::ConfigOption()
 {

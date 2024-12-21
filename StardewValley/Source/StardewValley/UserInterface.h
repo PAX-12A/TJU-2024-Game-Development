@@ -53,7 +53,7 @@ public:
 	UFUNCTION()
 	void ReturnToGame();
 	UFUNCTION()
-	void ReturnToTitle();
+	void GoodbyeWorld();
 	UFUNCTION()
 	void ConfigOption();
 public:
