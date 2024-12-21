@@ -37,7 +37,8 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
-	
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.AddUObject(this, &USceneManager::ChangeGrassGroundToEarthGround);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnPloughingEarthGround.AddUObject(this, &USceneManager::ChangeEarthGroundToFieldGround);
 }
 
 void USceneManager::Deinitialize()
