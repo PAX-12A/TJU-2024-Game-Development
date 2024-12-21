@@ -297,6 +297,7 @@ void USceneManager::ChangeEarthGroundToFieldGround(float x, float y)
 	int32 x_index;
 	int32 y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(x_index, y_index) != nullptr)return;
 	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(x_index, y_index) == "EarthGround")
 	{
 		CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "FieldGround");
@@ -309,6 +310,7 @@ void USceneManager::ChangeGrassGroundToEarthGround(float x, float y)
 	int32 x_index;
 	int32 y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(x_index, y_index) != nullptr)return;
 	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(x_index, y_index) == "GrassGround")
 	{
 		CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "EarthGround");
@@ -449,6 +451,7 @@ void USceneManager::GenerateItems()
 	}
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
+	InvokeUIMenu();
 	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("WidgetBlueprint'/Game/UMG/WBP_Shortcut.WBP_Shortcut_C'"));
 	if (WidgetClass)
 	{
@@ -525,7 +528,10 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 
 void USceneManager::InvokeUIMenu()
 {
-	if (is_menu_exist)return;
+	if (is_menu_exist)
+	{
+		return;
+	}
 	else is_menu_exist = true;
 	GetGameInstance()->GetFirstLocalPlayerController()->SetPause(true);
 	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));
