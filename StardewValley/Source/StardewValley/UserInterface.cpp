@@ -36,7 +36,7 @@ bool UUserInterface::Initialize()
 	}
 
 	item_selected_ = -1;
-
+	ChangeToSystem();
 	/*--------------------------------Change the panel---------------------------------*/
 	UButton* BtnBag = Cast<UButton>(GetWidgetFromName("BtnBag"));
 	UButton* BtnPlayer = Cast<UButton>(GetWidgetFromName("BtnPlayer"));
@@ -165,6 +165,7 @@ bool UUserInterface::Initialize()
 		if (EventSystem != nullptr)
 		{
 			EventSystem->OnAnExpBarFull.AddUObject(this, &UUserInterface::EnableALevelUpButton);
+			EventSystem->OnSkillExpUpdate.AddUObject(this, &UUserInterface::ExpGiver);
 		}
 	}
 	BtnAexUp->OnClicked.AddDynamic(this, &UUserInterface::AxeLevelUp);
@@ -378,6 +379,27 @@ void UUserInterface::ScytheLevelUp()
 	FSlateBrush brush;
 	brush.SetResourceObject(texture2d);
 	scythe_icon->SetBrush(brush);
+}
+void UUserInterface::ExpGiver(int32 type, int32 amount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ExpGiver"));
+	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
+	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
+	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
+	switch (type)
+	{
+	case 1:
+		IncreaseProgressBarValue(BarAexExp, static_cast<float>(amount) / 100.0f);
+		break;
+	case 2:
+		IncreaseProgressBarValue(BarHoeExp, static_cast<float>(amount) / 100.0f);
+		break;
+	case 3:
+		IncreaseProgressBarValue(BarScytheExp, static_cast<float>(amount) / 100.0f);
+		break;
+	default:
+		break;
+	}
 }
 void UUserInterface::DEBUGGER()
 {

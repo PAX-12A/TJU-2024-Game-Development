@@ -79,6 +79,7 @@ public:
 	void HoeLevelUp();
 	UFUNCTION()
 	void ScytheLevelUp();
+	void ExpGiver(int32 type, int32 amount);
 public:
 	//Bag panel
 	/**
