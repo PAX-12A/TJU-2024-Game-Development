@@ -9,16 +9,22 @@
 
 #include "CharacterManager.h"
 #include "MyCharacter.h"
+#include "NPC_Character.h"
 
 void UCharacterManager::CharacterGenerate() {
 	UE_LOG(LogTemp, Warning, TEXT("Character Generate"));
-	UClass* AMyCharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_MyCharacter.BP_MyCharacter_C"));
 
+	UClass* AMyCharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_MyCharacter.BP_MyCharacter_C"));
 	FVector SpawnLocation = FVector(1000.0f, 5500.0f, 1000.0f);
 	FRotator SpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
 	UWorld* World = GetWorld();
 	if (World == nullptr) return;
 	AMyCharacter* CharacterInstance = World->SpawnActor<AMyCharacter>(AMyCharacterClass, SpawnLocation, SpawnRotation);
+
+	UClass* ANPC_CharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_NPC_Character.BP_NPC_Character_C"));
+	FVector SpawnLocation1 = FVector(1400.0f, 5500.0f, 75.0f);
+	FRotator SpawnRotation1 = FRotator(0.0f, 0.0f, 0.0f);
+	ANPC_Character* NPC_CharacterInstance1 = World->SpawnActor<ANPC_Character>(ANPC_CharacterClass, SpawnLocation1, SpawnRotation1);
 
 	// Set Auto Possess Player to Player 0
 	GetWorld()->GetFirstPlayerController()->Possess(CharacterInstance);
