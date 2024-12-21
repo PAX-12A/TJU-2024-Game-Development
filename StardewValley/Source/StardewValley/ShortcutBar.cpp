@@ -24,7 +24,7 @@ bool UShortcutBar::Initialize()
 		{
 			EventSystem->OnItemAddedToShortcutBar.AddUObject(this, &UShortcutBar::AddItemToShortcutBar);
 			EventSystem->OnItemRemovedFromShortcutBar.AddUObject(this, &UShortcutBar::RemoveItemFromShortcutBar);
-			EventSystem->OnEquipTool.AddUObject(this, &UShortcutBar::HighLightActiveItem);
+			EventSystem->OnShortcutSelected.AddUObject(this, &UShortcutBar::HighLightActiveItem);
 		}
 	}
 	return true;

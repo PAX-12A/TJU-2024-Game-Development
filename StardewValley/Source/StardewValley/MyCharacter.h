@@ -55,16 +55,16 @@ private:
 	//Move in Up direction
 	void MoveUp(float Value);
 
-	void CharacterEquipTool1();
-	void CharacterEquipTool2();
-	void CharacterEquipTool3();
-	void CharacterEquipTool4();
-	void CharacterEquipTool5();
-	void CharacterEquipTool6();
-	void CharacterEquipTool7();
-	void CharacterEquipTool8();
-	void CharacterEquipTool9();
-	void CharacterEquipTool10();
+	void CharacterSelectShortcut1();
+	void CharacterSelectShortcut2();
+	void CharacterSelectShortcut3();
+	void CharacterSelectShortcut4();
+	void CharacterSelectShortcut5();
+	void CharacterSelectShortcut6();
+	void CharacterSelectShortcut7();
+	void CharacterSelectShortcut8();
+	void CharacterSelectShortcut9();
+	void CharacterSelectShortcut10();
 
 	void MouseClick();
 
@@ -74,12 +74,16 @@ private:
 	void UseSkill2();
 	void UseSkill3();
 
+	void Skill1ExpUpdate();
+	void Skill2ExpUpdate();
+	void Skill3ExpUpdate();
+
 	void CallMenu();
 	//void SkillLevelUpdate(int32 skill_experience,int32 skill_type);
 
 	void CharacterLocationUpdate();
 
-	int32 now_tool_;
+	int32 now_shortcut_;
 
 	float default_axe_range_ = 200.0f;
 	float default_hoe_range_ = 200.0f;
