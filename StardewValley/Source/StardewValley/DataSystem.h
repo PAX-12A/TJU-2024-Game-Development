@@ -152,6 +152,7 @@ public:
 		if (player_bag_.Contains(id)) { player_bag_[id] += amount; }
 		else { player_bag_.Add(id, amount); };
 	}
+	void set_shortBar(TArray<int32> shortCutBar) { shortBar_ = shortCutBar; };
 	/*-----------------------------Others-----------------------------*/
 public:
 	//Other functions
