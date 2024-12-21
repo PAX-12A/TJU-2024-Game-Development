@@ -15,14 +15,15 @@ void UDataSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
 
+	do_save = true;
 	LoadGame();
 }
 
 void UDataSystem::Deinitialize()
 {
     Super::Deinitialize();
-
-	SaveGame();
+	
+	if (do_save)SaveGame();
 }
 
 void UDataSystem::SaveGame()
