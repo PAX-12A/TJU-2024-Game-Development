@@ -29,22 +29,4 @@ public:
 	void CharacterSave();
 
 	void CharacterLoad();
-/*
-protected:
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	int32 character_level;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	int32 character_experience;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	int32 character_skill_point;
-	
-	UPROPERTY(VisibleAnywhere)
-	class AMyCharacter* CharacterNowControl;
-	
-	UPROPERTY(VisibleAnywhere)
-	FVector CharacterLocation
-*/
 };
