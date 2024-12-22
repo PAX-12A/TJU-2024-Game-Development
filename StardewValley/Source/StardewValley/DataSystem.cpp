@@ -43,7 +43,8 @@ void UDataSystem::SaveGame()
 		SaveGameInstance->ground_block_y_length_ = ground_block_y_length_;
 		SaveGameInstance->ground_block_size_ = ground_block_size_;
 		SaveGameInstance->ground_block_type_.Empty();
-		SaveGameInstance->ground_block_delta_temperature_.Empty();
+		SaveGameInstance->ground_block_delta_temperature_.Empty();		
+
 		for (int i = 0; i < ground_block_x_length_ * ground_block_y_length_; i++)//Ground block data saved
 		{
 			SaveGameInstance->ground_block_type_.Add(ground_block_type_[i]);
@@ -76,6 +77,8 @@ void UDataSystem::SaveGame()
 		{
 			SaveGameInstance->player_bag_.Add(it);
 		}
+
+		SaveGameInstance->short_Bar_ = shortBar_;//Short bar data saved
 
 		// Save the data to a file
 		bool bSuccess = UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("SavedGame"), 0);
@@ -138,5 +141,6 @@ void UDataSystem::LoadGame()
 		{
 			player_bag_.Add(it);
 		}
+		set_shortBar(LoadedGame->short_Bar_);// Short bar data loaded
 	}
 }
