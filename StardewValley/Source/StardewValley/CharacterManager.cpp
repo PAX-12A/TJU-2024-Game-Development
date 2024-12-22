@@ -21,8 +21,8 @@ void UCharacterManager::CharacterGenerate() {
 	if (World == nullptr) return;
 	AMyCharacter* CharacterInstance = World->SpawnActor<AMyCharacter>(AMyCharacterClass, SpawnLocation, SpawnRotation);
 
-	UClass* ANPC_CharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_NPC_Character.BP_NPC_Character_C"));
-	FVector SpawnLocation1 = FVector(1400.0f, 5500.0f, 75.0f);
+	UClass* ANPC_CharacterClass = LoadObject<UClass>(nullptr, TEXT("/Game/Character/BP_NewNPCCharacter.BP_NewNPCCharacter_C"));
+	FVector SpawnLocation1 = FVector(1400.0f, 5500.0f, 60.0f);
 	FRotator SpawnRotation1 = FRotator(0.0f, 0.0f, 0.0f);
 	ANPC_Character* NPC_CharacterInstance1 = World->SpawnActor<ANPC_Character>(ANPC_CharacterClass, SpawnLocation1, SpawnRotation1);
 
