@@ -191,8 +191,43 @@ bool UUserInterface::Initialize()
 	{
 		for (auto item : GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag())
 		{
+			if (item.Value <= 0)continue;
 			AddItemToBag(item.Key, item.Value);
 			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(item.Key, -1 * item.Value);
+		}
+		for (int32 i = 1; i <= 10; i++)
+		{
+			int32 id = GetGameInstance()->GetSubsystem<UDataSystem>()->getShortBar(i);
+			if (id == 0)continue;
+			FName name = FName("BtnShortcut_" + FString::FromInt(i));
+			UItemButton* button = Cast<UItemButton>(GetWidgetFromName(name));
+			button->SetRenderTransformPivot(FVector2D(0.0f, 0.0f));
+			UImage* image = Cast<UImage>(button->GetChildAt(0));
+
+			button->SetRenderScale(FVector2D(3.5f, 2.5f));
+			FString new_name = FString::Printf(TEXT("ShortcutItemIcon%d"), i);
+			const TCHAR* the_new_name = new_name.GetCharArray().GetData();
+			image->Rename(the_new_name);
+
+			UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
+			FStruct_ItemBase* item_info = item_data_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(id)), "");
+			if (item_info != nullptr)
+			{
+				UTexture2D* texture = item_info->icon_;
+				FSlateBrush brush;
+				brush.SetResourceObject(texture);
+				image->SetBrush(brush);
+				image->SetBrushSize(FVector2D(20.0, 30.0));
+			}
+			else
+			{
+				UTexture2D* texture = LoadObject<UTexture2D>(nullptr, TEXT("Texture2D'/Game/Asset/Icon/Ico_Test_4oD.Ico_Test_4oD'"));
+				FSlateBrush brush;
+				brush.SetResourceObject(texture);
+				image->SetBrush(brush);
+				image->SetBrushSize(FVector2D(20.0, 30.0));
+			}
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemAddedToShortcutBar.Broadcast(id, i);
 		}
 		if (GetGameInstance()->GetSubsystem<UEventSystem>() != nullptr)
 		{
