@@ -38,6 +38,10 @@ AMyCharacter::AMyCharacter()
 
 	// Set Auto Possess Player to Player 0
 	//this->AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	Hero_Level=0;
+	Player_Exp=0;
+	Player_MaxExp=experience_table[Hero_Level];
 }
 
 // Called when the game starts or when spawned
@@ -70,7 +74,13 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	Player_Exp+=0.1f;
+	if(Player_Exp>=Player_MaxExp){
+		Hero_Level++;
+		Player_Exp = 0;
+		Player_MaxExp = experience_table[Hero_Level];
+		UE_LOG(LogTemp, Warning, TEXT("Level Up !Exp to next Level:%d"), Player_MaxExp);
+	}
 }
 
 // Called to bind functionality to input
@@ -110,6 +120,7 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 void AMyCharacter::MoveY(float Value)
 {
+
 	AddMovementInput(GetActorForwardVector(), 1.5 * Value);
 }
 
