@@ -402,7 +402,7 @@ void USceneManager::GenerateItems()
 	}
 	else
 	{
-		GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(20, 1);
+		GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(20, 1);//Initial axe
 		int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
 		int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
 		for (int i = 1; i <= 25; i++)
