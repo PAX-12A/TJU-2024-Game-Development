@@ -15,12 +15,15 @@
 #include "Engine/DataTable.h"
 #include "Struct_ItemBlockBase.h"
 #include "UserInterface.h"
+#include <random>
+#include <ctime>
 
 
 void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
+	srand(time(nullptr));
 	is_menu_exist = false;
 	UWorld* World = GetWorld();
 	if (World)
@@ -34,7 +37,8 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
-	
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.AddUObject(this, &USceneManager::ChangeGrassGroundToEarthGround);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnPloughingEarthGround.AddUObject(this, &USceneManager::ChangeEarthGroundToFieldGround);
 }
 
 void USceneManager::Deinitialize()
@@ -90,21 +94,30 @@ void USceneManager::GenerateMap()
 				GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(i, 0);
 			}
 
-			for (int i = 100; i < x_length; i++)
-			{
-				for (int j = 29; j < y_length; j++)
+			for (int i = 0; i <= 71; i++)
+				for (int j = 99; j <= 127; j++)
 				{
 					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(i, j, "WaterGround");
+					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(i, j, 0);
 				}
-			}
-			for (int i = 0; i < 28; i++)
-			{
-				for (int j = 30; j < 70; j++)
+			for (int i = 32; i <= 83; i++)
+				for (int j = 43; j <= 89; j++)
+				{
+					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(i, j, "FieldGround");
+					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(i, j, 0);
+				}
+			for (int i = 29; i <= 88; i++)
+				for (int j = 29; j <= 37; j++)
 				{
 					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(i, j, "EarthGround");
-					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(i + 50, y_length - 1 - j, "EarthGround");
+					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(i, j, 0);
 				}
-			}
+			for (int i = 89; i <= 97; i++)
+				for (int j = 29; j <= 92; j++)
+				{
+					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_type(i, j, "EarthGround");
+					GetGameInstance()->GetSubsystem<UDataSystem>()->set_ground_block_delta_temperature(i, j, 0);
+				}
 		}
 		AActor* GroundInstance = nullptr;
 		// Spawn the ground
@@ -284,6 +297,7 @@ void USceneManager::ChangeEarthGroundToFieldGround(float x, float y)
 	int32 x_index;
 	int32 y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(x_index, y_index) != nullptr)return;
 	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(x_index, y_index) == "EarthGround")
 	{
 		CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "FieldGround");
@@ -296,6 +310,7 @@ void USceneManager::ChangeGrassGroundToEarthGround(float x, float y)
 	int32 x_index;
 	int32 y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
+	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block(x_index, y_index) != nullptr)return;
 	if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_type(x_index, y_index) == "GrassGround")
 	{
 		CreateGroundBlockByLocation(x_index * block_size, y_index * block_size, "EarthGround");
@@ -389,11 +404,39 @@ void USceneManager::GenerateItems()
 	{
 		int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
 		int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
-		/*for (int i = 55; i < 60; i++)
-			for (int j = 55; j < 60; j++)
+		for (int i = 1; i <= 25; i++)
+			for (int j = 40; j <= 98; j++)
 			{
-				CreateItemBlockByLocation(i * block_size, j * block_size, 16);
-			}*/
+				CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, 2);
+			}
+		for (int i = 26; i < x_length - 1; i++)
+			for (int j = 1; j <= 10; j++)
+			{
+				int id = rand() % 14 + 1;
+				if (id != 5 && id != 6 && id != 12 && id != 13 && id != 14)id = 6;
+				CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, id);	
+			}
+		for (int i = 115; i < x_length - 1; i++)
+			for (int j = 11; j <= 43; j++)
+			{
+				int id = rand() % 14 + 1;
+				if (id != 5 && id != 6 && id != 12 && id != 13 && id != 14)id = 6;
+				CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, id);
+			}
+		for (int i = 106; i < x_length - 1; i++)
+			for (int j = 44; j < y_length - 1; j++)
+			{
+				int id = rand() % 14 + 1;
+				if (id != 5 && id != 6 && id != 12 && id != 13 && id != 14)id = 6;
+				CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, id);
+			}
+		for (int i = 72; i <= 105; i++)
+			for (int j = 114; j < y_length - 1; j++)
+			{
+				int id = rand() % 14 + 1;
+				if (id != 5 && id != 6 && id != 12 && id != 13 && id != 14)id = 6;
+				CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, id);
+			}
 		for (int i = 0; i < x_length; i++)//wall
 		{
 			CreateItemBlockByLocation(static_cast<float>(i * block_size + block_size / 2), static_cast<float>(block_size / 2), 4);
@@ -408,6 +451,7 @@ void USceneManager::GenerateItems()
 	}
 
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
+	InvokeUIMenu();
 	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("WidgetBlueprint'/Game/UMG/WBP_Shortcut.WBP_Shortcut_C'"));
 	if (WidgetClass)
 	{
@@ -418,9 +462,10 @@ void USceneManager::GenerateItems()
 			Widget->AddToViewport();
 		}
 	}
-	/*GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockMowed.Broadcast(3 * block_size + block_size / 2, 3 * block_size + block_size / 2);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockMowed.Broadcast(3 * block_size + block_size / 2, 4 * block_size + block_size / 2);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundBlockPloughed.Broadcast(3 * block_size + block_size / 2, 3 * block_size + block_size / 2);*/
+	/*for (int i = 0; i <= 16; i++)
+	{
+		CreateItemBlockByLocation(3 * block_size, (i + 1) * block_size, i);
+	}*/
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
 UClass* USceneManager::TypeToClass(FString type)//unused.
@@ -483,7 +528,10 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 
 void USceneManager::InvokeUIMenu()
 {
-	if (is_menu_exist)return;
+	if (is_menu_exist)
+	{
+		return;
+	}
 	else is_menu_exist = true;
 	GetGameInstance()->GetFirstLocalPlayerController()->SetPause(true);
 	UClass* WidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/UMG/WBP_Menu.WBP_Menu_C"));

@@ -20,7 +20,7 @@ class STARDEWVALLEY_API UUserInterface : public UUserWidget
 	GENERATED_BODY()
 private:
 	const float kMaxExpForEachLevel = 100.0f;
-	const float kMaxLevel = 10.0f;
+	const float kMaxLevel = 4.0f;
 public:
 	bool Initialize() override;
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
@@ -53,7 +53,7 @@ public:
 	UFUNCTION()
 	void ReturnToGame();
 	UFUNCTION()
-	void ReturnToTitle();
+	void GoodbyeWorld();
 	UFUNCTION()
 	void ConfigOption();
 public:
@@ -79,6 +79,7 @@ public:
 	void HoeLevelUp();
 	UFUNCTION()
 	void ScytheLevelUp();
+	void ExpGiver(int32 type, int32 amount);
 public:
 	//Bag panel
 	/**

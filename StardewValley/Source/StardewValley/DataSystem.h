@@ -168,4 +168,5 @@ public:
 	 *
 	 */
 	void LoadGame();
+	bool do_save;
 };

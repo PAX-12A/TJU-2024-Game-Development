@@ -25,6 +25,7 @@
 #include "Struct_ItemBase.h"
 #include "Engine/StreamableManager.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "EventSystem.h"
 #include "DataSystem.h"
 
@@ -36,7 +37,7 @@ bool UUserInterface::Initialize()
 	}
 
 	item_selected_ = -1;
-
+	ChangeToSystem();
 	/*--------------------------------Change the panel---------------------------------*/
 	UButton* BtnBag = Cast<UButton>(GetWidgetFromName("BtnBag"));
 	UButton* BtnPlayer = Cast<UButton>(GetWidgetFromName("BtnPlayer"));
@@ -79,7 +80,7 @@ bool UUserInterface::Initialize()
 	UButton* BtnExit = Cast<UButton>(GetWidgetFromName("BtnExit"));
 	UButton* BtnSaveGame = Cast<UButton>(GetWidgetFromName("BtnSaveGame"));
 	UButton* BtnReturnToGame = Cast<UButton>(GetWidgetFromName("BtnReturnToGame"));
-	UButton* BtnReturnTitle = Cast<UButton>(GetWidgetFromName("BtnReturnTitle"));
+	UButton* BtnGoodbyeWorld = Cast<UButton>(GetWidgetFromName("BtnGoodbyeWorld"));
 	UButton* BtnOptioin = Cast<UButton>(GetWidgetFromName("BtnOption"));
 	if (BtnExit != nullptr)
 	{
@@ -93,9 +94,9 @@ bool UUserInterface::Initialize()
 	{
 		BtnReturnToGame->OnClicked.AddDynamic(this, &UUserInterface::ReturnToGame);
 	}
-	if (BtnReturnTitle != nullptr)
+	if (BtnGoodbyeWorld != nullptr)
 	{
-		BtnReturnTitle->OnClicked.AddDynamic(this, &UUserInterface::ReturnToTitle);
+		BtnGoodbyeWorld->OnClicked.AddDynamic(this, &UUserInterface::GoodbyeWorld);
 	}
 	if (BtnOptioin != nullptr)
 	{
@@ -109,20 +110,53 @@ bool UUserInterface::Initialize()
 	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
 	UProgressBar* BarScytheSkill = Cast<UProgressBar>(GetWidgetFromName("BarScytheSkill"));
 	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
-	SetProgressBarValue(BarAexExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_exp()) / kMaxExpForEachLevel);
-	SetProgressBarValue(BarHoeExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_exp()) / kMaxExpForEachLevel);
-	SetProgressBarValue(BarScytheExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_exp()) / kMaxExpForEachLevel);
-	SetProgressBarValue(BarAexSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level()) / kMaxLevel);
-	SetProgressBarValue(BarHoeSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level()) / kMaxLevel);
-	SetProgressBarValue(BarScytheSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level()) / kMaxLevel);
+	if (GetGameInstance() != nullptr && GetGameInstance()->GetSubsystem<UDataSystem>() != nullptr)
+	{
+		SetProgressBarValue(BarAexExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_exp()) / kMaxExpForEachLevel);
+		SetProgressBarValue(BarHoeExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_exp()) / kMaxExpForEachLevel);
+		SetProgressBarValue(BarScytheExp, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_exp()) / kMaxExpForEachLevel);
+		SetProgressBarValue(BarAexSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level()) / kMaxLevel);
+		SetProgressBarValue(BarHoeSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level()) / kMaxLevel);
+		SetProgressBarValue(BarScytheSkill, static_cast<float>(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level()) / kMaxLevel);
+		int32 level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level();
+		if (level != 0)
+		{
+			FString addr = "/Game/Asset/Icon/Ico_Item_Aex_Level" + FString::FromInt(level) + ".Ico_Item_Aex_Level" + FString::FromInt(level);
+			UTexture2D* texture2d = LoadObject<UTexture2D>(nullptr, addr.GetCharArray().GetData());
+			UImage* axe_icon = Cast<UImage>(GetWidgetFromName("ImgAxeLevel"));
+			FSlateBrush brush;
+			brush.SetResourceObject(texture2d);
+			axe_icon->SetBrush(brush);
+		}
+		level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level();
+		if (level != 0)
+		{
+			FString addr = "/Game/Asset/Icon/Ico_Item_Hoe_Level" + FString::FromInt(level) + ".Ico_Item_Hoe_Level" + FString::FromInt(level);
+			UTexture2D* texture2d = LoadObject<UTexture2D>(nullptr, addr.GetCharArray().GetData());
+			UImage* hoe_icon = Cast<UImage>(GetWidgetFromName("ImgHoeLevel"));
+			FSlateBrush brush;
+			brush.SetResourceObject(texture2d);
+			hoe_icon->SetBrush(brush);
+		}
+		level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level();
+		if (level != 0)
+		{
+			FString addr = "/Game/Asset/Icon/Ico_Item_Scythe_Level" + FString::FromInt(level) + ".Ico_Item_Scythe_Level" + FString::FromInt(level);
+			UTexture2D* texture2d = LoadObject<UTexture2D>(nullptr, addr.GetCharArray().GetData());
+			UImage* scythe_icon = Cast<UImage>(GetWidgetFromName("ImgScytheLevel"));
+			FSlateBrush brush;
+			brush.SetResourceObject(texture2d);
+			scythe_icon->SetBrush(brush);
+		}
+	}
 	UButton* BtnAexUp = Cast<UButton>(GetWidgetFromName("BtnAexUp"));
 	UButton* BtnHoeUp = Cast<UButton>(GetWidgetFromName("BtnHoeUp"));
 	UButton* BtnScytheUp = Cast<UButton>(GetWidgetFromName("BtnScytheUp"));
-	if (BarAexExp != nullptr && BarAexExp->Percent == 1.0f)BtnAexUp->SetIsEnabled(true);
+	if (BarAexExp != nullptr && BarAexExp->Percent == 1.0f && fabs(BarAexSkill->Percent - 1.0f) > KINDA_SMALL_NUMBER)BtnAexUp->SetIsEnabled(true);
 	else BtnAexUp->SetIsEnabled(false);
-	if (BarHoeExp != nullptr && BarHoeExp->Percent == 1.0f)BtnHoeUp->SetIsEnabled(true);
+	if (BarHoeExp != nullptr && BarHoeExp->Percent == 1.0f && fabs(BarHoeSkill->Percent - 1.0f) > KINDA_SMALL_NUMBER)BtnHoeUp->SetIsEnabled(true);
 	else BtnHoeUp->SetIsEnabled(false);
-	if (BarScytheExp != nullptr && BarScytheExp->Percent == 1.0f)BtnScytheUp->SetIsEnabled(true);
+	if (BarScytheExp != nullptr && BarScytheExp->Percent == 1.0f && fabs(BarScytheSkill->Percent - 1.0f) > KINDA_SMALL_NUMBER)BtnScytheUp->SetIsEnabled(true);
 	else BtnScytheUp->SetIsEnabled(false);
 
 	auto GameInstance = GetGameInstance();
@@ -132,6 +166,7 @@ bool UUserInterface::Initialize()
 		if (EventSystem != nullptr)
 		{
 			EventSystem->OnAnExpBarFull.AddUObject(this, &UUserInterface::EnableALevelUpButton);
+			EventSystem->OnSkillExpUpdate.AddUObject(this, &UUserInterface::ExpGiver);
 		}
 	}
 	BtnAexUp->OnClicked.AddDynamic(this, &UUserInterface::AxeLevelUp);
@@ -152,10 +187,13 @@ bool UUserInterface::Initialize()
 			UE_LOG(LogTemp, Warning, TEXT("Button %s not found or is nullptr"), *ButtonName);
 		}
 	}
-	for (auto item : GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag())
+	if (GetGameInstance() != nullptr && GetGameInstance()->GetSubsystem<UDataSystem>() != nullptr)
 	{
-		AddItemToBag(item.Key, item.Value);
-		GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(item.Key, -1 * item.Value);
+		for (auto item : GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag())
+		{
+			AddItemToBag(item.Key, item.Value);
+			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(item.Key, -1 * item.Value);
+		}
 	}
 
 	/*--------------------------------Debug Panel---------------------------------*/
@@ -186,14 +224,33 @@ void UUserInterface::SaveGame()
 }
 void UUserInterface::ReturnToGame()
 {
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	//GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 	GetGameInstance()->GetFirstLocalPlayerController()->SetPause(false);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.Broadcast();
 	RemoveFromParent();
 }
-void UUserInterface::ReturnToTitle()
+void UUserInterface::GoodbyeWorld()
 {
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnReturnTitle.Broadcast();
+	auto GetSaveGameFilePath = [](const FString& SlotName) -> FString
+		{
+			FString SaveDirectory = FPaths::ProjectSavedDir() / TEXT("SaveGames");
+
+			FString SaveGameFileName = SlotName + TEXT(".sav");
+			FString SaveGameFilePath = SaveDirectory / SaveGameFileName;
+
+			return SaveGameFilePath;
+		};
+	FString SaveGameFilePath = GetSaveGameFilePath("SavedGame");
+	UE_LOG(LogTemp, Warning, TEXT("address : %s"), *SaveGameFilePath);
+
+	if (IFileManager::Get().FileExists(*SaveGameFilePath))
+	{
+		bool bSuccess = IFileManager::Get().Delete(*SaveGameFilePath);
+		UE_LOG(LogTemp, Warning, TEXT("Delete : %d"), bSuccess);
+	}
+	GetGameInstance()->GetSubsystem<UDataSystem>()->do_save = false;
+	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, true);
 }
 void UUserInterface::ConfigOption()
 {
@@ -204,6 +261,7 @@ void UUserInterface::IncreaseProgressBarValue(UProgressBar* bar, float value)
 	if (bar != nullptr)
 	{
 		float current_value = bar->Percent;
+		if (fabs(current_value - 1.0f) < KINDA_SMALL_NUMBER) return;
 		float new_value;
 		if (value + current_value > 1.0f)
 			bar->SetPercent((new_value = 1.0f));
@@ -281,46 +339,98 @@ void UUserInterface::AxeLevelUp()
 	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
 	UProgressBar* BarAexSkill = Cast<UProgressBar>(GetWidgetFromName("BarAexSkill"));
 	UButton* BtnAexUp = Cast<UButton>(GetWidgetFromName("BtnAexUp"));
-	IncreaseProgressBarValue(BarAexSkill, 0.1f);
+	IncreaseProgressBarValue(BarAexSkill, 0.25f);
 	SetProgressBarValue(BarAexExp, 0.0f);
 	BtnAexUp->SetIsEnabled(false);
 
 	//Update data system
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_axe_level(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level() + 1);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_axe_exp(0);
+
+	//Change the icon
+	int32 level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level();
+	FString addr = "/Game/Asset/Icon/Ico_Item_Aex_Level" + FString::FromInt(level) + ".Ico_Item_Aex_Level" + FString::FromInt(level);
+	UTexture2D* texture2d = LoadObject<UTexture2D>(nullptr, addr.GetCharArray().GetData());
+	UImage* axe_icon = Cast<UImage>(GetWidgetFromName("ImgAxeLevel"));
+	FSlateBrush brush;
+	brush.SetResourceObject(texture2d);
+	axe_icon->SetBrush(brush);
 }
 void UUserInterface::HoeLevelUp()
 {
 	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
 	UProgressBar* BarHoeSkill = Cast<UProgressBar>(GetWidgetFromName("BarHoeSkill"));
 	UButton* BtnHoeUp = Cast<UButton>(GetWidgetFromName("BtnHoeUp"));
-	IncreaseProgressBarValue(BarHoeSkill, 0.1f);
+	IncreaseProgressBarValue(BarHoeSkill, 0.25f);
 	SetProgressBarValue(BarHoeExp, 0.0f);
 	BtnHoeUp->SetIsEnabled(false);
 
 	//Update data system
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_hoe_level(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level() + 1);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_hoe_exp(0);
+
+	//Change the icon
+	int32 level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level();
+	FString addr = "/Game/Asset/Icon/Ico_Item_Hoe_Level" + FString::FromInt(level) + ".Ico_Item_Hoe_Level" + FString::FromInt(level);
+	UTexture2D* texture2d = LoadObject<UTexture2D>(nullptr, addr.GetCharArray().GetData());
+	UImage* hoe_icon = Cast<UImage>(GetWidgetFromName("ImgHoeLevel"));
+	FSlateBrush brush;
+	brush.SetResourceObject(texture2d);
+	hoe_icon->SetBrush(brush);
 }
 void UUserInterface::ScytheLevelUp()
 {
 	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
 	UProgressBar* BarScytheSkill = Cast<UProgressBar>(GetWidgetFromName("BarScytheSkill"));
 	UButton* BtnScytheUp = Cast<UButton>(GetWidgetFromName("BtnScytheUp"));
-	IncreaseProgressBarValue(BarScytheSkill, 0.1f);
+	IncreaseProgressBarValue(BarScytheSkill, 0.25f);
 	SetProgressBarValue(BarScytheExp, 0.0f);
 	BtnScytheUp->SetIsEnabled(false);
 
 	//Update data system
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_scythe_level(GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level() + 1);
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_player_scythe_exp(0);
+
+	//Change the icon
+	int32 level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level();
+	FString addr = "/Game/Asset/Icon/Ico_Item_Scythe_Level" + FString::FromInt(level) + ".Ico_Item_Scythe_Level" + FString::FromInt(level);
+	UTexture2D* texture2d = LoadObject<UTexture2D>(nullptr, addr.GetCharArray().GetData());
+	UImage* scythe_icon = Cast<UImage>(GetWidgetFromName("ImgScytheLevel"));
+	FSlateBrush brush;
+	brush.SetResourceObject(texture2d);
+	scythe_icon->SetBrush(brush);
+}
+void UUserInterface::ExpGiver(int32 type, int32 amount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ExpGiver"));
+	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
+	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
+	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
+	switch (type)
+	{
+	case 1:
+		IncreaseProgressBarValue(BarAexExp, static_cast<float>(amount) / 100.0f);
+		break;
+	case 2:
+		IncreaseProgressBarValue(BarHoeExp, static_cast<float>(amount) / 100.0f);
+		break;
+	case 3:
+		IncreaseProgressBarValue(BarScytheExp, static_cast<float>(amount) / 100.0f);
+		break;
+	default:
+		break;
+	}
 }
 void UUserInterface::DEBUGGER()
 {
 	for (int32 i = 0; i < 66; i++)
 		AddItemToBag(i, 1);
 	UProgressBar* BarAexExp = Cast<UProgressBar>(GetWidgetFromName("BarAexExp"));
+	UProgressBar* BarHoeExp = Cast<UProgressBar>(GetWidgetFromName("BarHoeExp"));
+	UProgressBar* BarScytheExp = Cast<UProgressBar>(GetWidgetFromName("BarScytheExp"));
 	IncreaseProgressBarValue(BarAexExp, 0.2f);
+	IncreaseProgressBarValue(BarHoeExp, 0.2f);
+	IncreaseProgressBarValue(BarScytheExp, 0.2f);
 }
 void UUserInterface::AddItemToBag(int32 id, int32 amount)
 {

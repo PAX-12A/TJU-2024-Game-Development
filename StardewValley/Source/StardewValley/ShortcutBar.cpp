@@ -14,6 +14,8 @@ bool UShortcutBar::Initialize()
 		return false;
 	}
 
+	active_item_index_ = 2;
+	HighLightActiveItem(1);
 	auto GameInstance = GetGameInstance();
 	if (GameInstance != nullptr)
 	{
@@ -22,6 +24,7 @@ bool UShortcutBar::Initialize()
 		{
 			EventSystem->OnItemAddedToShortcutBar.AddUObject(this, &UShortcutBar::AddItemToShortcutBar);
 			EventSystem->OnItemRemovedFromShortcutBar.AddUObject(this, &UShortcutBar::RemoveItemFromShortcutBar);
+			EventSystem->OnShortcutSelected.AddUObject(this, &UShortcutBar::HighLightActiveItem);
 		}
 	}
 	return true;
@@ -67,4 +70,21 @@ void UShortcutBar::RemoveItemFromShortcutBar(int32 index)
 		image->SetBrush(brush);
 		image->SetRenderScale(FVector2D(3.0f, 3.0f));
 	}
+}
+void UShortcutBar::HighLightActiveItem(int32 index)
+{
+	if (index == active_item_index_) return;
+	FName name = FName("ImgShortcut_" + FString::FromInt(index));
+	FName old_name = FName("ImgShortcut_" + FString::FromInt(active_item_index_));
+	UImage* image = Cast<UImage>(GetWidgetFromName(name));
+	UImage* old_image = Cast<UImage>(GetWidgetFromName(old_name));
+	if (image != nullptr)
+	{
+		image->SetColorAndOpacity(FLinearColor(0.0f, 1.0f, 1.0f, 1.0f));
+	}
+	if (old_image != nullptr)
+	{
+		old_image->SetColorAndOpacity(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+	active_item_index_ = index;
 }

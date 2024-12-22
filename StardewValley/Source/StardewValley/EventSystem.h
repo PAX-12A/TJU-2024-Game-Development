@@ -16,6 +16,8 @@ DECLARE_MULTICAST_DELEGATE(FMulticastDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FMulticastDelegateOneParam, int32);
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoParams, float, float);
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FMulticastDelegateThreeParams, int32, float, float)
 DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticastDelegateTwoInt32Params, int32, int32);
 DECLARE_MULTICAST_DELEGATE_FourParams(FMulticastDelegateFourParams, int32, int32, float, float);
 
@@ -70,5 +72,10 @@ public:
 	FMulticastDelegate OnCharacterMenuClosed;//Close the character menu
 	FMulticastDelegate OnCharacterMenuOpened;//Open the character menu
 	*/
-	FMulticastDelegateOneParam OnToolUsed;//Use the tool
+	FMulticastDelegateOneParam OnShortcutSelected;//Equip the tool
+	FMulticastDelegateThreeParams OnToolsTowardsItemBlock;//Give the tool type(int32) and position(float, float) of the tool
+	FMulticastDelegateThreeParams OnPlacingItem;//Give the item type(int32) and position(float, float) of the item need to be placed
+	FMulticastDelegateTwoParams OnMowingGrassGround;//Give the position(float, float) of the grass to be mowed
+	FMulticastDelegateTwoParams OnPloughingEarthGround;//Give the position(float, float) of the earth to be ploughed
+	FMulticastDelegateTwoInt32Params OnSkillExpUpdate;//skill1->axe skill2->hoe skill3->scythe
 };

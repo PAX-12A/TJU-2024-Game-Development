@@ -87,6 +87,7 @@ void AItemBlockBase::InitializeItemBlock(int32 id)
 		{
 			item_mesh_->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			item_mesh_->SetCollisionResponseToAllChannels(ECR_Block);
+			item_mesh_->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 		}
 		else if (item_info->type_ == 4)//Fire
 		{
