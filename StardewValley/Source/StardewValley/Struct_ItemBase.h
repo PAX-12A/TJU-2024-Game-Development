@@ -26,4 +26,30 @@ public:
 	int32 id_;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
 	UTexture2D* icon_;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 interaction_type_;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	FString name_;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 attack_;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 price_;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 max_durability_;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 durability_;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 use_area;//fanwei
+
+
+	//背包到快捷栏输出一个数组到数据系统
+
+
 };

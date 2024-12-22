@@ -119,38 +119,45 @@ void AItemBlockBase::Grow()
 	{
 		throw std::out_of_range("Out of range");
 	}
-
-	lived_time_++;
-	GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_lived_time(x_index, y_index, lived_time_);
-
-	int32 id = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_id(x_index, y_index);
-	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
-	FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(id)), "");
-	int32 accumulated_time = 0;
-	for (int32 i = 1; i <= item_info->map_lifespan_.Num(); i++)
+	int32 base_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_present_base_temperature();
+	int32 delta_temperature = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_delta_temperature(x_index, y_index);
+	int32 temperature = base_temperature + delta_temperature;
+	int32 grow_times = temperature / 10;
+	for (int time = 0; time < grow_times; time++)
 	{
-		if(item_info->map_lifespan_.Contains(i))
+		lived_time_++;
+		GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_lived_time(x_index, y_index, lived_time_);
+
+		int32 id = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_id(x_index, y_index);
+		UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
+		FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(id)), "");
+		int32 accumulated_time = 0;
+		for (int32 i = 1; i <= item_info->map_lifespan_.Num(); i++)
 		{
-			accumulated_time += item_info->map_lifespan_[i] * 60;
-			if (lived_time_ == accumulated_time)
+			if (item_info->map_lifespan_.Contains(i))
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("Crop at %d, %d grows"), x_index, y_index);
-				SetAppearanceByStatus(i + 1);
-				break;
+				accumulated_time += item_info->map_lifespan_[i] * 60;
+				if (lived_time_ == accumulated_time)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Crop at %d, %d grows, status %d"), x_index, y_index, i + 1);
+					SetAppearanceByStatus(i + 1);
+					break;
+				}
 			}
 		}
-	}
-	accumulated_time = 0;
-	for (auto status : item_info->map_lifespan_)
-	{
-		accumulated_time += status.Value * 60;
-	}
-	if (lived_time_ >= accumulated_time)
-	{
-		GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_id(x_index, y_index, -1);
-		GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_lived_time(x_index, y_index, -1);
-		GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block(x_index, y_index, nullptr);
-		Destroy();
+		accumulated_time = 0;
+		for (auto status : item_info->map_lifespan_)
+		{
+			accumulated_time += status.Value * 60;
+		}
+		if (lived_time_ >= accumulated_time)
+		{
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_id(x_index, y_index, -1);
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_lived_time(x_index, y_index, -1);
+			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block(x_index, y_index, nullptr);
+			Destroy();
+			break;
+		}
 	}
 }
 void AItemBlockBase::GetThirsty()
@@ -195,7 +202,7 @@ void AItemBlockBase::SetAppearanceByStatus(int32 status)
 	auto CalculateScaleOfStatus = [scale](int32 status)->FVector
 		{
 			FVector temp_scale = scale;
-			const float kGrowthRate = 1.25f;
+			const float kGrowthRate = 1.5f;
 			for (int32 i = 1; i < status; i++)
 			{
 				temp_scale *= kGrowthRate;

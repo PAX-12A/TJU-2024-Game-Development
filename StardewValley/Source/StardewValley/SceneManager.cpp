@@ -462,10 +462,6 @@ void USceneManager::GenerateItems()
 			Widget->AddToViewport();
 		}
 	}
-	/*for (int i = 0; i <= 16; i++)
-	{
-		CreateItemBlockByLocation(3 * block_size, (i + 1) * block_size, i);
-	}*/
 	/*----------------------------------------------TEST BLOCK------------------------------------------*/
 }
 UClass* USceneManager::TypeToClass(FString type)//unused.
