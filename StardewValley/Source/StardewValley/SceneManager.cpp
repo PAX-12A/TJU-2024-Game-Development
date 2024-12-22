@@ -402,13 +402,31 @@ void USceneManager::GenerateItems()
 	}
 	else
 	{
-		GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(20, 1);//Initial axe
+		for (int32 i = 1; i <= 31; i++)
+			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(i, 1);//initial items
 		int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
 		int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
 		for (int i = 1; i <= 25; i++)
 			for (int j = 40; j <= 98; j++)
 			{
+				if(rand() % 4 <= 2)
 				CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, 2);
+			}
+		for (int i = 1; i < x_length - 1; i++)
+			for (int j = 1; j <= y_length - 1; j++)
+			{
+				if (i >5 && i < 15 && j > 25 && j < 35)continue;
+				if(rand() % 20 == 1)
+				{
+					int32 id = rand() % 16 + 1;
+					if (id == 7 || id == 8 || id == 4)id = 5;
+					CreateItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2, id);
+				}
+			}
+		for (int i = 0; i <= 71; i++)
+			for (int j = 99; j <= 127; j++)
+			{
+				DestroyItemBlockByLocation(i * block_size + block_size / 2, j * block_size + block_size / 2);
 			}
 		for (int i = 26; i < x_length - 1; i++)
 			for (int j = 1; j <= 10; j++)
@@ -515,6 +533,14 @@ void USceneManager::ItemBlockInteractionHandler(int32 id, float x, float y)
 				GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemUsedup.Broadcast(id);
 			return;
 		}
+		if (GetGroundBlockTypeByLocation(x, y) == "WaterGround" && interaction_type == 10)
+		{
+			if(rand() % 2)
+			{
+				int32 id = 30 + rand() % 2;
+				GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(id, 1);
+			}
+		}
 	}
 	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
 	FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(item_id)), "");
@@ -524,7 +550,7 @@ void USceneManager::ItemBlockInteractionHandler(int32 id, float x, float y)
 		if (item_info->interaction_accepted_.Find(interaction_type) != INDEX_NONE)//interaction accepted
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Interaction accepted, %s, %s"), *item_information->name_, *item_info->name_);
-			if (interaction_type == 5 || interaction_type == 8)
+			if (interaction_type == 5 || interaction_type == 8 || interaction_type == 7)
 			{
 				int32 previous_durability = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_durability(x_index, y_index);
 				GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_durability(x_index, y_index, previous_durability - damage);
@@ -538,6 +564,10 @@ void USceneManager::ItemBlockInteractionHandler(int32 id, float x, float y)
 					}
 					DestroyItemBlockByLocation(x, y);
 				}
+			}
+			if (interaction_type == 9)
+			{
+				WaterCropAtLocation(x, y);
 			}
 		}
 		else

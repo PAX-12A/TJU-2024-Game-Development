@@ -74,13 +74,6 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Player_Exp+=0.1f;
-	if(Player_Exp>=Player_MaxExp){
-		Hero_Level++;
-		Player_Exp = 0;
-		Player_MaxExp = experience_table[Hero_Level];
-		UE_LOG(LogTemp, Warning, TEXT("Level Up !Exp to next Level:%d"), Player_MaxExp);
-	}
 
 	UpdateCharacterRotation();
 }
@@ -315,6 +308,15 @@ void AMyCharacter::MouseClick() {
 }
 
 void AMyCharacter::CharacterToolsUse(FVector Location) {
+
+	Player_Exp += 10.0f;
+	if (Player_Exp >= Player_MaxExp) {
+		Hero_Level++;
+		Player_Exp = 0;
+		Player_MaxExp = experience_table[Hero_Level];
+		UE_LOG(LogTemp, Warning, TEXT("Level Up !Exp to next Level:%d"), Player_MaxExp);
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("Hit Location: %f, %f, %f"), Location.X, Location.Y, Location.Z);
 	UE_LOG(LogTemp, Warning, TEXT("CharacterUseTools"));
 	UE_LOG(LogTemp, Warning, TEXT("Now Shortcut: %d"), now_shortcut_);
@@ -345,6 +347,7 @@ void AMyCharacter::CharacterToolsUse(FVector Location) {
 	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distance);
 
 	if (permit_range - distance > KINDA_SMALL_NUMBER) {
+
 		if (now_item_id == 21 || now_item_id == 25)//item is tool->hoe
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnPloughingEarthGround.Broadcast(Location.X, Location.Y);
 
