@@ -134,7 +134,7 @@ public:
 	 * \param x The x location of the interaction, a float
 	 * \param y The y location of the interaction, a float
 	 */
-	void ItemBlockInteractionHandler(int32 interaction_type, int32 damage, float x, float y);
+	void ItemBlockInteractionHandler(int32 id, float x, float y);
 	void InvokeUIMenu();
 	void SetIsMenuExistToFalse();
 
