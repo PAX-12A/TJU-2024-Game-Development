@@ -17,6 +17,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<UUserWidget> HUDAsset;
 	UUserWidget* HUD;
+	void RemoveWidget();
+	UUserWidget* CurrentWidget;
+	FTimerHandle RemoveMenuTimerHandle; // ¶¨Ê±Æ÷¾ä±ú
+
 protected:
 	virtual void BeginPlay() override;
 };

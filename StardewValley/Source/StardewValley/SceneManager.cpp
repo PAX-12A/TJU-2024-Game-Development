@@ -22,13 +22,12 @@
 void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-
 	srand(time(nullptr));
 	is_menu_exist = false;
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		World->GetTimerManager().SetTimer(timer_handler_, this, &USceneManager::GenerateMap, 2.0f, false);//Delay the generation of the map, otherwise the world may not be ready, and the map will not be generated
+		World->GetTimerManager().SetTimer(timer_handler_, this, &USceneManager::GenerateMap, 2.0f, false);
 	}
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGroundGenerated.AddUObject(this, &USceneManager::GenerateItems);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &USceneManager::ChangeEarthGroundToSnowGround);
