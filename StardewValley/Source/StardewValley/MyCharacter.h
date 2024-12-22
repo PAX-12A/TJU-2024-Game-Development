@@ -53,11 +53,25 @@ protected:
 	class UCameraComponent* CameraComponent;
 
 private:
+	void UpdateCharacterRotation();
+
 	//Move in Y direction
 	void MoveY(float Value);
+	int32 MoveYFlag;
+	void SetMoveYFlag1();
+	void SetMoveYFlag2();
+	void ResetMoveYFlag();
 
 	//Move in X direction
 	void MoveX(float Value);
+	int32 MoveXFlag;
+	void SetMoveXFlag1();
+	void SetMoveXFlag2();
+	void ResetMoveXFlag();
+
+	FVector Direction;
+	FRotator CharacterRotation;
+	FRotator SpringRotation;
 
 	//Move in Up direction
 	void MoveUp(float Value);
