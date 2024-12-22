@@ -15,7 +15,7 @@
 #include "DataSystem.h"
 #include "MyCharacter.generated.h"
 
-const static int32 experience_table[20] = { 0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900 };
+const static int32 experience_table[20] = { 10,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900 };
 
 UCLASS()
 class STARDEWVALLEY_API AMyCharacter : public ACharacter
@@ -34,6 +34,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	int32 CharacterPosZ;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	int32 Hero_Level;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	float Player_Exp;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	int32 Player_MaxExp;
 
 protected:
 	// Called when the game starts or when spawned

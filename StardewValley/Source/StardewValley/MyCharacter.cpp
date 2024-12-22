@@ -35,6 +35,9 @@ AMyCharacter::AMyCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	//Attach Camera
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	// Set Auto Possess Player to Player 0
+	//this->AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
 // Called when the game starts or when spawned
@@ -70,6 +73,13 @@ void AMyCharacter::BeginPlay()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Player_Exp+=0.1f;
+	if(Player_Exp>=Player_MaxExp){
+		Hero_Level++;
+		Player_Exp = 0;
+		Player_MaxExp = experience_table[Hero_Level];
+		UE_LOG(LogTemp, Warning, TEXT("Level Up !Exp to next Level:%d"), Player_MaxExp);
+	}
 
 	UpdateCharacterRotation();
 }

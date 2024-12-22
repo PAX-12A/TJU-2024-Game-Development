@@ -58,6 +58,9 @@ private:
 	int32 player_hoe_exp_;
 	int32 player_scythe_exp_;
 	TMap<int32, int32> player_bag_;
+public:
+	//shortCutBar id
+	TArray <int32> shortBar_;
 	/*-----------------------------Getters-----------------------------*/
 public:
 	//Time data getters
@@ -152,6 +155,7 @@ public:
 		if (player_bag_.Contains(id)) { player_bag_[id] += amount; }
 		else { player_bag_.Add(id, amount); };
 	}
+	void set_shortBar(TArray<int32> shortCutBar) { shortBar_ = shortCutBar; };
 	/*-----------------------------Others-----------------------------*/
 public:
 	//Other functions
