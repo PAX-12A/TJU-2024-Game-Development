@@ -10,6 +10,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Engine/DataTable.h"
+#include "Struct_ItemBase.h"
 #include "TimerManager.h"
 #include "EventSystem.h"
 #include "DataSystem.h"
@@ -106,11 +108,8 @@ private:
 
 	void CharacterLocationUpdate();
 
-	int32 now_shortcut_;
+	int32 now_shortcut_ = 1;
 
-	float default_axe_range_ = 200.0f;
-	float default_hoe_range_ = 200.0f;
-	float default_scythe_range_ = 200.0f;
 	float axe_range_;
 	float hoe_range_;
 	float scythe_range_;
@@ -142,6 +141,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	FVector CharacterLocation;
+
+	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
 
 public:	
 	// Called every frame
