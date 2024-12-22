@@ -67,4 +67,9 @@ public:
 	int32 player_scythe_exp_;
 	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
 	TMap<int32, int32> player_bag_;
+
+	UPROPERTY(VisibleAnywhere, Category = "SaveGame")
+	TArray<int32> short_Bar_;
+
+
 };

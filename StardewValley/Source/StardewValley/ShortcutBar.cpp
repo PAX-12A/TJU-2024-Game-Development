@@ -6,12 +6,22 @@
 #include "Struct_ItemBase.h"
 #include "Components/Image.h"
 #include "EventSystem.h"
+#include "DataSystem.h"
 
 bool UShortcutBar::Initialize()
 {
 	if (!Super::Initialize())
 	{
 		return false;
+	}
+
+	for (int32 i = 1; i <= 10; i++)
+	{
+		int32 id = GetGameInstance()->GetSubsystem<UDataSystem>()->getShortBar(i);
+		if (id != 0 && id != -1)
+		{
+			AddItemToShortcutBar(id, i);
+		}
 	}
 
 	active_item_index_ = 2;
@@ -25,6 +35,7 @@ bool UShortcutBar::Initialize()
 			EventSystem->OnItemAddedToShortcutBar.AddUObject(this, &UShortcutBar::AddItemToShortcutBar);
 			EventSystem->OnItemRemovedFromShortcutBar.AddUObject(this, &UShortcutBar::RemoveItemFromShortcutBar);
 			EventSystem->OnShortcutSelected.AddUObject(this, &UShortcutBar::HighLightActiveItem);
+			EventSystem->OnItemUsedup.AddUObject(this, &UShortcutBar::RemoveItem);
 		}
 	}
 	return true;
@@ -87,4 +98,18 @@ void UShortcutBar::HighLightActiveItem(int32 index)
 		old_image->SetColorAndOpacity(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	active_item_index_ = index;
+}
+void UShortcutBar::RemoveItem(int32 id)
+{
+	TArray<int32> short_bar = GetGameInstance()->GetSubsystem<UDataSystem>()->getShortBar();
+	int32 i = 0;
+	for (; i < short_bar.Num(); i++)
+	{
+		if (short_bar[i] == id)
+		{
+			RemoveItemFromShortcutBar(i);
+			break;
+		}
+	}
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(i, 0);
 }

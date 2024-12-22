@@ -108,8 +108,12 @@ public:
 	int32 get_player_scythe_exp() { return player_scythe_exp_; };
 	int32 get_amount_of_item_in_bag(int32 index) { if (player_bag_.Contains(index))return player_bag_[index]; else return 0; };
 	TMap<int32, int32> get_player_bag() { return player_bag_; };
-	int32 getShortBar(int32 index){return shortBar_[index];};
-	TArray<int32> getShortBar(){return shortBar_;};
+	int32 getShortBar(int32 index) {
+		if (index < 1 || index > 10) return 0;
+		while (index + 1 >= shortBar_.Num()) shortBar_.Add(0);
+		return shortBar_[index];
+	};
+	TArray<int32> getShortBar() { return shortBar_; };
 	/*-----------------------------Setters-----------------------------*/
 public:
 	//Time data setters
@@ -159,7 +163,7 @@ public:
 		else { player_bag_.Add(id, amount); };
 	}
 	void set_shortBar(TArray<int32> shortCutBar) { shortBar_ = shortCutBar; };
-	void set_shortBar(int32 index, int32 id) { shortBar_[index] = id; };
+	void set_shortBar(int32 index, int32 id) { if (index < 1 || index > 10) return; while (shortBar_.Num() <= index) { shortBar_.Add(0); }; shortBar_[index] = id; };
 	/*-----------------------------Others-----------------------------*/
 public:
 	//Other functions

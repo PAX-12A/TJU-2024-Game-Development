@@ -79,4 +79,5 @@ public:
 	FMulticastDelegateTwoParams OnMowingGrassGround;//Give the position(float, float) of the grass to be mowed
 	FMulticastDelegateTwoParams OnPloughingEarthGround;//Give the position(float, float) of the earth to be ploughed
 	FMulticastDelegateTwoInt32Params OnSkillExpUpdate;//skill1->axe skill2->hoe skill3->scythe
+	FMulticastDelegateOneParam OnItemUsedup;
 };

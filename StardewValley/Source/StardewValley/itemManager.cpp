@@ -8,7 +8,7 @@
 #include"Struct_ItemBase.h"
 UitemManager::UitemManager()
 {
-	shortBar.Init(0, shortBarSize+1);
+	//GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(shortBar);
 
 	//the table of some item
 	AxeComposeTable.Add(9, 3);//iron 3
@@ -32,8 +32,13 @@ void UitemManager::Initialize(FSubsystemCollectionBase& Collection)
 	UE_LOG(LogTemp, Warning, TEXT("CharacterManager Initialize"));
 
 	UEventSystem* EventSystem = Collection.InitializeDependency<UEventSystem>();
+	UDataSystem* DataSystem = Collection.InitializeDependency<UDataSystem>();
 
-	
+	shortBar.Empty();
+	for (int32 i = 0; i <= 10; i++)
+	{
+		shortBar.Add(DataSystem->getShortBar(i));
+	}
 	
 	EventSystem->OnItemAddedToShortcutBar.AddUObject(this, &UitemManager::putItemShortBar);
 	EventSystem->OnItemRemovedFromShortcutBar.AddUObject(this, &UitemManager::removeItemShortBar);
@@ -120,4 +125,11 @@ void UitemManager::makeItem(int itemId)//shoule except some parameter and broadc
 
 
 }
+
+void UitemManager::deleteItem(int itemId,int index)//shoule except some parameter and broadcast
+{
+	shortBar[index] = 0;
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(shortBar);//set data in data system
+}
+
 

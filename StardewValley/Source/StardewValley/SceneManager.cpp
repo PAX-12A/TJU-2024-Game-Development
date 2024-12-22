@@ -14,6 +14,7 @@
 #include "ItemBlockBase.h"
 #include "Engine/DataTable.h"
 #include "Struct_ItemBlockBase.h"
+#include "Struct_ItemBase.h"
 #include "UserInterface.h"
 #include <random>
 #include <ctime>
@@ -33,7 +34,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &USceneManager::ChangeEarthGroundToSnowGround);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &USceneManager::ChangeSnowGroundToEarthGround);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.AddUObject(this, &USceneManager::WaterCropAtLocation);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockInteracted.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolsTowardsItemBlock.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.AddUObject(this, &USceneManager::ChangeGrassGroundToEarthGround);
@@ -489,13 +490,32 @@ void USceneManager::WaterCropAtLocation(float x, float y)
 		item_class->WaterThisCrop();
 	}
 }
-void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 damage, float x, float y)
+void USceneManager::ItemBlockInteractionHandler(int32 id, float x, float y)
 {
+	UDataTable* item_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
+	FStruct_ItemBase* item_information = item_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(id)), "");
+	if (item_information == nullptr)return;
+
+	int32 interaction_type = item_information->interaction_type_;
+	int32 damage = item_information->attack_;
+	int32 item_placed = item_information->putId;
+
 	int x_index, y_index;
 	GetIndexOfTheGroundBlockByLocation(x, y, x_index, y_index);
 	int32 item_id = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_id(x_index, y_index);
 	
-	if (item_id == -1)return;
+	if (item_id == -1)
+	{
+		if(GetGroundBlockTypeByLocation(x, y) != "" && item_placed != 0)
+		{
+			CreateItemBlockByLocation(x, y, item_placed);
+			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(id, -1);
+			UE_LOG(LogTemp, Warning, TEXT("Number of %s is now %d"), *item_information->name_, GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag()[id]);
+			if (GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag()[id] == 0)
+				GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemUsedup.Broadcast(id);
+			return;
+		}
+	}
 	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBlockBase.DT_ItemBlockBase"));
 	FStruct_ItemBlockBase* item_info = item_data_table->FindRow<FStruct_ItemBlockBase>(FName(*FString::FromInt(item_id)), "");
 	if (item_info == nullptr)return;
@@ -503,6 +523,7 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 	{
 		if (item_info->interaction_accepted_.Find(interaction_type) != INDEX_NONE)//interaction accepted
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Interaction accepted, %s, %s"), *item_information->name_, *item_info->name_);
 			if (interaction_type == 5 || interaction_type == 8)
 			{
 				int32 previous_durability = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_durability(x_index, y_index);
@@ -512,7 +533,8 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 				{
 					for (auto item : item_info->map_item_drop_)
 					{
-						GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(item.Key, item.Value);
+						UE_LOG(LogTemp, Warning, TEXT("Drop Item: %d, %d"), item.Key, item.Value);
+						GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(item.Key, item.Value);
 					}
 					DestroyItemBlockByLocation(x, y);
 				}

@@ -10,6 +10,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Engine/DataTable.h"
+#include "Struct_ItemBase.h"
 #include "TimerManager.h"
 #include "EventSystem.h"
 #include "DataSystem.h"
@@ -106,15 +108,15 @@ private:
 
 	void CharacterLocationUpdate();
 
-	int32 now_shortcut_;
+	int32 now_shortcut_ = 1;
 
-	float default_axe_range_ = 200.0f;
-	float default_hoe_range_ = 200.0f;
-	float default_scythe_range_ = 200.0f;
 	float axe_range_;
 	float hoe_range_;
 	float scythe_range_;
 
+	float axe_duration = 3.0f;
+	float hoe_duration = 3.0f;
+	float scythe_duration = 3.0f;
 	float axe_cool_down_duration = 5.0f;
 	float hoe_cool_down_duration = 5.0f;
 	float scythe_cool_down_duration = 5.0f;
@@ -122,17 +124,25 @@ private:
 	FTimerHandle AxeTimerHandle;
 	FTimerHandle HoeTimerHandle;
 	FTimerHandle ScytheTimerHandle;
+	FTimerHandle AxeEndTimerHandle;
+	FTimerHandle HoeEndTimerHandle;
+	FTimerHandle ScytheEndTimerHandle;
 	
 	bool bIsAxeCoolDown = false;
 	bool bIsHoeCoolDown = false;
 	bool bIsScytheCoolDown = false;
 
+	void AxeSkillEnd();
+	void HoeSkillEnd();
+	void ScytheSkillEnd();
 	void AxeEndCoolDown();
 	void HoeEndCoolDown();
 	void ScytheEndCoolDown();
 
 	UPROPERTY(VisibleAnywhere)
 	FVector CharacterLocation;
+
+	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
 
 public:	
 	// Called every frame

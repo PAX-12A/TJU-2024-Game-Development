@@ -28,4 +28,5 @@ public:
 	 * \param index The index of the active item
 	 */
 	void HighLightActiveItem(int32 index);
+	void RemoveItem(int32 id);
 };
