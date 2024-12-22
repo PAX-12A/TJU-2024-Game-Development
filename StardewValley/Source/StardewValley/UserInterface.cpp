@@ -438,6 +438,7 @@ void UUserInterface::DEBUGGER()
 }
 void UUserInterface::AddItemToBag(int32 id, int32 amount)
 {
+	UE_LOG(LogTemp, Warning, TEXT("AddItemToBag"));
 	GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(id, amount);
 	if (ItemsInBag.Contains(id))//If the item is already in the bag, increase the amount of the item in the bag
 	{
