@@ -8,7 +8,6 @@
 #include"Struct_ItemBase.h"
 UitemManager::UitemManager()
 {
-	shortBar.Init(-1, shortBarSize+1);
 	//GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(shortBar);
 
 	//the table of some item
@@ -33,8 +32,13 @@ void UitemManager::Initialize(FSubsystemCollectionBase& Collection)
 	UE_LOG(LogTemp, Warning, TEXT("CharacterManager Initialize"));
 
 	UEventSystem* EventSystem = Collection.InitializeDependency<UEventSystem>();
+	UDataSystem* DataSystem = Collection.InitializeDependency<UDataSystem>();
 
-	
+	shortBar.Empty();
+	for (int32 i = 0; i <= 10; i++)
+	{
+		shortBar.Add(DataSystem->getShortBar(i));
+	}
 	
 	EventSystem->OnItemAddedToShortcutBar.AddUObject(this, &UitemManager::putItemShortBar);
 	EventSystem->OnItemRemovedFromShortcutBar.AddUObject(this, &UitemManager::removeItemShortBar);

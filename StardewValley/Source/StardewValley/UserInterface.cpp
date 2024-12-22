@@ -198,7 +198,8 @@ bool UUserInterface::Initialize()
 		for (int32 i = 1; i <= 10; i++)
 		{
 			int32 id = GetGameInstance()->GetSubsystem<UDataSystem>()->getShortBar(i);
-			if (id == 0)continue;
+			UE_LOG(LogTemp, Warning, TEXT("id = %d"), id);
+			if (id == 0 || id == -1)continue;
 			FName name = FName("BtnShortcut_" + FString::FromInt(i));
 			UItemButton* button = Cast<UItemButton>(GetWidgetFromName(name));
 			button->SetRenderTransformPivot(FVector2D(0.0f, 0.0f));
@@ -227,7 +228,6 @@ bool UUserInterface::Initialize()
 				image->SetBrush(brush);
 				image->SetBrushSize(FVector2D(20.0, 30.0));
 			}
-			GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemAddedToShortcutBar.Broadcast(id, i);
 		}
 		if (GetGameInstance()->GetSubsystem<UEventSystem>() != nullptr)
 		{
