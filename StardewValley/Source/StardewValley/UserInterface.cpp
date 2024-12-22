@@ -194,6 +194,10 @@ bool UUserInterface::Initialize()
 			AddItemToBag(item.Key, item.Value);
 			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(item.Key, -1 * item.Value);
 		}
+		if (GetGameInstance()->GetSubsystem<UEventSystem>() != nullptr)
+		{
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.AddUObject(this, &UUserInterface::AddItemToBag);
+		}
 	}
 
 	/*--------------------------------Debug Panel---------------------------------*/
