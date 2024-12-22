@@ -8,7 +8,8 @@
 #include"Struct_ItemBase.h"
 UitemManager::UitemManager()
 {
-	shortBar.Init(0, shortBarSize+1);
+	shortBar.Init(-1, shortBarSize+1);
+	//GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(shortBar);
 
 	//the table of some item
 	AxeComposeTable.Add(9, 3);//iron 3
@@ -120,4 +121,11 @@ void UitemManager::makeItem(int itemId)//shoule except some parameter and broadc
 
 
 }
+
+void UitemManager::deleteItem(int itemId,int index)//shoule except some parameter and broadcast
+{
+	shortBar[index] = 0;
+	GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(shortBar);//set data in data system
+}
+
 

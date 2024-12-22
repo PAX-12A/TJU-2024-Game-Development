@@ -46,7 +46,7 @@ public:
 
 	void makeItem(int itemId);
 
-
+	void deleteItem(int itemId,int index);
 
 
 	
