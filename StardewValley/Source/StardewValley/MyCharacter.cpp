@@ -35,9 +35,6 @@ AMyCharacter::AMyCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	//Attach Camera
 	CameraComponent->SetupAttachment(SpringArmComponent);
-
-	// Set Auto Possess Player to Player 0
-	//this->AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
 // Called when the game starts or when spawned
@@ -64,6 +61,9 @@ void AMyCharacter::BeginPlay()
 	//GetGameInstance()->GetSubsystem<UEventSystem>()->OnWoodAxed.AddUObject(this, &AMyCharacter::Skill1ExpUpdate);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnEarthGroundPloughed.AddUObject(this, &AMyCharacter::Skill2ExpUpdate);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnGrassGroundMowed.AddUObject(this, &AMyCharacter::Skill3ExpUpdate);
+
+	CharacterRotation = FRotator(0.0f, 90.0f, 0.0f);
+	SpringRotation = FRotator(-45.0f, -90.0f, 0.0f);
 }
 
 // Called every frame
@@ -71,6 +71,7 @@ void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UpdateCharacterRotation();
 }
 
 // Called to bind functionality to input
@@ -83,6 +84,16 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis(FName("MoveX"), this, &AMyCharacter::MoveX);
 	//Bind MoveUp Function
 	PlayerInputComponent->BindAxis(FName("MoveUp"), this, &AMyCharacter::MoveUp);
+
+	//BindSetFlagFunction
+	PlayerInputComponent->BindAction(FName("SetMoveYFlag1"), IE_Pressed, this, &AMyCharacter::SetMoveYFlag1);
+	PlayerInputComponent->BindAction(FName("SetMoveYFlag2"), IE_Pressed, this, &AMyCharacter::SetMoveYFlag2);
+	PlayerInputComponent->BindAction(FName("SetMoveXFlag1"), IE_Pressed, this, &AMyCharacter::SetMoveXFlag1);
+	PlayerInputComponent->BindAction(FName("SetMoveXFlag2"), IE_Pressed, this, &AMyCharacter::SetMoveXFlag2);
+
+	//BindResetFlagFunction
+	PlayerInputComponent->BindAction(FName("ResetMoveYFlag"), IE_Released, this, &AMyCharacter::ResetMoveYFlag);
+	PlayerInputComponent->BindAction(FName("ResetMoveXFlag"), IE_Released, this, &AMyCharacter::ResetMoveXFlag);
 
 	//Bind Equipment Functions
 	PlayerInputComponent->BindAction(FName("Equip1"), IE_Pressed, this, &AMyCharacter::CharacterSelectShortcut1);
@@ -108,19 +119,117 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction(FName("Menu"), IE_Pressed, this, &AMyCharacter::CallMenu);
 }
 
+void AMyCharacter::SetMoveYFlag1() {
+	MoveYFlag = 1;
+}
+
+void AMyCharacter::SetMoveYFlag2() {
+	MoveYFlag = -1;
+}
+
+void AMyCharacter::SetMoveXFlag1() {
+	MoveXFlag = 1;
+}
+
+void AMyCharacter::SetMoveXFlag2() {
+	MoveXFlag = -1;
+}
+
+void AMyCharacter::ResetMoveYFlag() { 
+	MoveYFlag = 0;
+}
+
+void AMyCharacter::ResetMoveXFlag() {
+	MoveXFlag = 0;
+}
+
+void AMyCharacter::UpdateCharacterRotation() {
+	if (MoveXFlag == 0 && MoveYFlag == 0){
+		this->SetActorRotation(CharacterRotation);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+
+	if (MoveXFlag == 0 && MoveYFlag == 1) {
+		CharacterRotation = FRotator(0.0f, 0.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, 0.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == 0 && MoveYFlag == -1) {
+		CharacterRotation = FRotator(0.0f, 180.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, -180.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == 1 && MoveYFlag == 0) {
+		CharacterRotation = FRotator(0.0f, -90.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, 90.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == -1 && MoveYFlag == 0) {
+		CharacterRotation = FRotator(0.0f, 90.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, -90.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == 1 && MoveYFlag == 1) {
+		CharacterRotation = FRotator(0.0f, -45.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, 45.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == -1 && MoveYFlag == 1) {
+		CharacterRotation = FRotator(0.0f, 45.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, -45.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == 1 && MoveYFlag == -1) {
+		CharacterRotation = FRotator(0.0f, -135.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, 135.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+	
+	if (MoveXFlag == -1 && MoveYFlag == -1) {
+		CharacterRotation = FRotator(0.0f, 135.0f, 0.0f);
+		this->SetActorRotation(CharacterRotation);
+		SpringRotation = FRotator(-45.0f, -135.0f, 0.0f);
+		SpringArmComponent->SetRelativeRotation(SpringRotation);
+		return;
+	}
+}
+
 void AMyCharacter::MoveY(float Value)
 {
-	AddMovementInput(GetActorForwardVector(), 1.5 * Value);
+	Direction = FVector(0.f, 1.f, 0.f);
+	AddMovementInput(Direction, 1.5 * Value);
 }
 
 void AMyCharacter::MoveX(float Value)
 {
-	AddMovementInput(GetActorRightVector(), 1.5 * Value);
+	Direction = FVector(1.f, 0.f, 0.f);
+	AddMovementInput(Direction, 1.5 * Value);
 }
 
 void AMyCharacter::MoveUp(float Value)
 {
-	SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, Value)); //Move UpLocation
+	SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, Value));
 }
 
 void AMyCharacter::CharacterSelectShortcut1() {
