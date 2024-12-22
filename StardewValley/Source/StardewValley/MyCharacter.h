@@ -115,6 +115,9 @@ private:
 	float hoe_range_;
 	float scythe_range_;
 
+	float axe_duration = 3.0f;
+	float hoe_duration = 3.0f;
+	float scythe_duration = 3.0f;
 	float axe_cool_down_duration = 5.0f;
 	float hoe_cool_down_duration = 5.0f;
 	float scythe_cool_down_duration = 5.0f;
@@ -122,11 +125,17 @@ private:
 	FTimerHandle AxeTimerHandle;
 	FTimerHandle HoeTimerHandle;
 	FTimerHandle ScytheTimerHandle;
+	FTimerHandle AxeEndTimerHandle;
+	FTimerHandle HoeEndTimerHandle;
+	FTimerHandle ScytheEndTimerHandle;
 	
 	bool bIsAxeCoolDown = false;
 	bool bIsHoeCoolDown = false;
 	bool bIsScytheCoolDown = false;
 
+	void AxeSkillEnd();
+	void HoeSkillEnd();
+	void ScytheSkillEnd();
 	void AxeEndCoolDown();
 	void HoeEndCoolDown();
 	void ScytheEndCoolDown();

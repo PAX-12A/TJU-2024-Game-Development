@@ -350,6 +350,7 @@ void AMyCharacter::UseSkill1() {
 	int32 axe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level();
 	bIsAxeCoolDown = true;
 	axe_range_ = axe_level * 50.f + default_axe_range_;
+	GetWorldTimerManager().SetTimer(AxeEndTimerHandle, this, &AMyCharacter::AxeSkillEnd, axe_duration);
 	GetWorldTimerManager().SetTimer(AxeTimerHandle, this, &AMyCharacter::AxeEndCoolDown, axe_cool_down_duration);
 }
 
@@ -363,6 +364,7 @@ void AMyCharacter::UseSkill2() {
 	int32 hoe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level();
 	bIsHoeCoolDown = true;
 	hoe_range_ = hoe_level * 50.f + default_hoe_range_;
+	GetWorldTimerManager().SetTimer(HoeEndTimerHandle, this, &AMyCharacter::HoeSkillEnd, hoe_duration);
 	GetWorldTimerManager().SetTimer(HoeTimerHandle, this, &AMyCharacter::HoeEndCoolDown, hoe_cool_down_duration);
 }
 
@@ -376,6 +378,7 @@ void AMyCharacter::UseSkill3() {
 	int32 scythe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level();
 	bIsScytheCoolDown = true;
 	scythe_range_ = scythe_level * 50.f + default_scythe_range_;
+	GetWorldTimerManager().SetTimer(ScytheEndTimerHandle, this, &AMyCharacter::ScytheSkillEnd, scythe_duration);
 	GetWorldTimerManager().SetTimer(ScytheTimerHandle, this, &AMyCharacter::ScytheEndCoolDown, scythe_cool_down_duration);
 }
 
@@ -389,6 +392,21 @@ void AMyCharacter::Skill2ExpUpdate() {
 
 void AMyCharacter::Skill3ExpUpdate() {
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSkillExpUpdate.Broadcast(3, 20);
+}
+
+void AMyCharacter::AxeSkillEnd() {
+	UE_LOG(LogTemp, Warning, TEXT("Skill1End"));
+	axe_range_ = default_axe_range_;
+}
+
+void AMyCharacter::HoeSkillEnd() {
+	UE_LOG(LogTemp, Warning, TEXT("Skill2End"));
+	hoe_range_ = default_hoe_range_;
+}
+
+void AMyCharacter::ScytheSkillEnd() {
+	UE_LOG(LogTemp, Warning, TEXT("Skill2End"));
+	scythe_range_ = default_scythe_range_;
 }
 
 void AMyCharacter::AxeEndCoolDown() {
