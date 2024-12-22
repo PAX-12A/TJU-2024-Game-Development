@@ -37,7 +37,7 @@ void UitemManager::Initialize(FSubsystemCollectionBase& Collection)
 	
 	EventSystem->OnItemAddedToShortcutBar.AddUObject(this, &UitemManager::putItemShortBar);
 	EventSystem->OnItemRemovedFromShortcutBar.AddUObject(this, &UitemManager::removeItemShortBar);
-	EventSystem->OnToolUsed.AddUObject(this, &UitemManager::useTool);
+	EventSystem->OnItemBlockAttacked.AddUObject(this, &UitemManager::useTool);
 
 
 
@@ -74,7 +74,7 @@ void UitemManager::removeItemShortBar(int32 removeIndex)
 	GetGameInstance()->GetSubsystem<UDataSystem>()->set_shortBar(shortBar);//set data in data system
 }
 
-void UitemManager::useTool(int32 useIndex)
+void UitemManager::useTool(int32 interractionType,int32 damage,float x,float y)
 {
 	
 
@@ -139,9 +139,3 @@ void UitemManager::makeItem(int itemId)//shoule except some parameter and broadc
 	}
 }
 
-void UDataSystem::Deinitialize()
-{
-	Super::Deinitialize();
-
-	SaveGame();
-}

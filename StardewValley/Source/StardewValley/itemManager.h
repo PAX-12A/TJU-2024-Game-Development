@@ -40,7 +40,7 @@ public:
 
 	void removeItemShortBar(int32 removeIndex);
 
-	void useTool(int32 receiveId);
+	void useTool(int32 interractionType, int32 damage, float x, float y);
 
 	int32 chooseItem(int index);
 
@@ -49,6 +49,6 @@ public:
 
 
 
-	void Deinitialize();
+	
 
 };
