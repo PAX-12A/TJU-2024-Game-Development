@@ -61,6 +61,7 @@ private:
 public:
 	//shortCutBar id
 	TArray <int32> shortBar_;
+	int32 coin;
 	/*-----------------------------Getters-----------------------------*/
 public:
 	//Time data getters
