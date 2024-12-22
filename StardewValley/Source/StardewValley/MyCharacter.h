@@ -41,6 +41,8 @@ public:
 	float Player_Exp;
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	int32 Player_MaxExp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 Player_Money;
 
 protected:
 	// Called when the game starts or when spawned

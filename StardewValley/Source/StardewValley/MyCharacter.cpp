@@ -38,6 +38,7 @@ AMyCharacter::AMyCharacter()
 
 	// Set Auto Possess Player to Player 0
 	//this->AutoPossessPlayer = EAutoReceiveInput::Player0;
+	Player_Money = 100;
 }
 
 // Called when the game starts or when spawned

@@ -46,8 +46,13 @@ public:
 	int32 durability_;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
-	int32 use_area;//fanwei
+	float use_area;//fanwei
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	int32 putId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Your Category")
+	TMap<int32, int32> makeTable;
 
 	//背包到快捷栏输出一个数组到数据系统
 

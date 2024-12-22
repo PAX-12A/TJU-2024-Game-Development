@@ -5,10 +5,10 @@
 #include "EventSystem.h"
 #include "myItem.h"
 #include"DataSystem.h"
-
+#include"Struct_ItemBase.h"
 UitemManager::UitemManager()
 {
-	shortBar.Init(0, shortBarSize);
+	shortBar.Init(0, shortBarSize+1);
 
 	//the table of some item
 	AxeComposeTable.Add(9, 3);//iron 3
@@ -93,49 +93,31 @@ void UitemManager::makeItem(int itemId)//shoule except some parameter and broadc
 	TMap<int32, int32> playerBag;
 	playerBag=GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_bag();
 
-	if (itemId == 20)
+	const int iron = 9;
+	const int cropper = 8;
+	const int wood = 18;
+	const int coal = 7;
+
+	UDataTable* item_data_table = LoadObject<UDataTable>(nullptr, TEXT("/Game/Datatable/DT_ItemBase.DT_ItemBase"));
+	FStruct_ItemBase* item_info = item_data_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(itemId)), "");
+	
+
+
+
+	if (item_info != nullptr)
 	{
-		if(playerBag[9]>=3&&playerBag[18]>=3)
+		UTexture2D* texture = item_info->icon_;
+		TMap<int32, int32> Table = item_info->makeTable;										
+		for (auto& i : Table)
 		{
-			playerBag[9] -= 3;
-			playerBag[18] -= 3;
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(9,-3);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(18,-3);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(20, 1);
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(i.Key, -(i.Value));						
 		}
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(itemId, 1);
+		
+		
+		
 	}
-	else if (itemId == 21)
-	{
-		if (playerBag[9] >= 2 && playerBag[18] >= 2)
-		{
-			playerBag[9] -= 2;
-			playerBag[18] -= 2;
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(9, -2);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(18, -2);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(21, 1);
-		}
-	}
-	else if (itemId == 22)
-	{
-		if (playerBag[9] >= 2 && playerBag[18] >= 3)
-		{
-			playerBag[9] -= 2;
-			playerBag[18] -= 3;
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(9, -2);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(18, -3);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(22, 1);
-		}
-	}
-	else if (itemId == 23)
-	{
-		if (playerBag[9] >= 3 && playerBag[18] >= 2)
-		{
-			playerBag[9] -= 3;
-			playerBag[18] -= 2;
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(9, -3);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(18, -2);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->add_item_to_bag(23, 1);
-		}
-	}
+
+
 }
 
