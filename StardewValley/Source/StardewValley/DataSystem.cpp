@@ -77,8 +77,10 @@ void UDataSystem::SaveGame()
 		{
 			SaveGameInstance->player_bag_.Add(it);
 		}
-
-		SaveGameInstance->short_Bar_ = shortBar_;//Short bar data saved
+		for (auto it : shortBar_)//Short bar data saved
+		{
+			SaveGameInstance->short_Bar_.Add(it);
+		}
 
 		// Save the data to a file
 		bool bSuccess = UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("SavedGame"), 0);
@@ -141,6 +143,10 @@ void UDataSystem::LoadGame()
 		{
 			player_bag_.Add(it);
 		}
-		set_shortBar(LoadedGame->short_Bar_);// Short bar data loaded
+		for (auto it : LoadedGame->short_Bar_)// Short bar data loaded
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%d"), it);
+			shortBar_.Add(it);
+		}
 	}
 }

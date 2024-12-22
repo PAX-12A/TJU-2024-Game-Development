@@ -15,6 +15,15 @@ bool UShortcutBar::Initialize()
 		return false;
 	}
 
+	for (int32 i = 1; i <= 10; i++)
+	{
+		int32 id = GetGameInstance()->GetSubsystem<UDataSystem>()->getShortBar(i);
+		if (id != 0 && id != -1)
+		{
+			AddItemToShortcutBar(id, i);
+		}
+	}
+
 	active_item_index_ = 2;
 	HighLightActiveItem(1);
 	auto GameInstance = GetGameInstance();
