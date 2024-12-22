@@ -40,14 +40,16 @@ void ANPC_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ANPC_Character::MoveForward()
 {
-	SetActorLocation(GetActorLocation() + FVector(0.f, 3.f, 0.f));
-	SetActorLocation(GetActorLocation() + FVector(3.f, 0.f, 0.f));
+	FRotator CharacterRotation(0.0f, -45.0f, 0.0f);
+	this->SetActorRotation(CharacterRotation);
+	SetActorLocation(GetActorLocation() + FVector(3.f, 3.f, 0.f));
 }
 
 void ANPC_Character::MoveBackward()
 {
-	SetActorLocation(GetActorLocation() + FVector(0.f, -3.f, 0.f));
-	SetActorLocation(GetActorLocation() + FVector(-3.f, 0.f, 0.f));
+	FRotator CharacterRotation(0.0f, 135.0f, 0.0f);
+	this->SetActorRotation(CharacterRotation);
+	SetActorLocation(GetActorLocation() + FVector(-3.f, -3.f, 0.f));
 }
 
 void ANPC_Character::SetMoveDirection() {
