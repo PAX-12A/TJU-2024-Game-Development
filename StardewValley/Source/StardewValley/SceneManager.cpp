@@ -34,7 +34,7 @@ void USceneManager::Initialize(FSubsystemCollectionBase& Collection)
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnWinterBegin.AddUObject(this, &USceneManager::ChangeEarthGroundToSnowGround);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSpringBegin.AddUObject(this, &USceneManager::ChangeSnowGroundToEarthGround);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->WaterCropAtGivenPosition.AddUObject(this, &USceneManager::WaterCropAtLocation);
-	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockAttacked.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
+	GetGameInstance()->GetSubsystem<UEventSystem>()->OnItemBlockInteracted.AddUObject(this, &USceneManager::ItemBlockInteractionHandler);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnCallingMenu.AddUObject(this, &USceneManager::InvokeUIMenu);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnUIMenuClosed.AddUObject(this, &USceneManager::SetIsMenuExistToFalse);
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.AddUObject(this, &USceneManager::ChangeGrassGroundToEarthGround);
@@ -402,6 +402,7 @@ void USceneManager::GenerateItems()
 	}
 	else
 	{
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(20, 1);
 		int32 x_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_x_length();
 		int32 y_length = GetGameInstance()->GetSubsystem<UDataSystem>()->get_ground_block_y_length();
 		for (int i = 1; i <= 25; i++)
@@ -503,16 +504,19 @@ void USceneManager::ItemBlockInteractionHandler(int32 interaction_type, int32 da
 	{
 		if (item_info->interaction_accepted_.Find(interaction_type) != INDEX_NONE)//interaction accepted
 		{
-			int32 previous_durability = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_durability(x_index, y_index);
-			GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_durability(x_index, y_index, previous_durability - damage);
-			//UE_LOG(LogTemp, Warning, TEXT("Durability: %d"), previous_durability - damage);
-			if (previous_durability - damage <= 0)
+			if (interaction_type == 5 || interaction_type == 8)
 			{
-				for (auto item : item_info->map_item_drop_)
+				int32 previous_durability = GetGameInstance()->GetSubsystem<UDataSystem>()->get_item_block_durability(x_index, y_index);
+				GetGameInstance()->GetSubsystem<UDataSystem>()->set_item_block_durability(x_index, y_index, previous_durability - damage);
+				//UE_LOG(LogTemp, Warning, TEXT("Durability: %d"), previous_durability - damage);
+				if (previous_durability - damage <= 0)
 				{
-					GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(item.Key, item.Value);
+					for (auto item : item_info->map_item_drop_)
+					{
+						GetGameInstance()->GetSubsystem<UEventSystem>()->OnGivenItems.Broadcast(item.Key, item.Value);
+					}
+					DestroyItemBlockByLocation(x, y);
 				}
-				DestroyItemBlockByLocation(x, y);
 			}
 		}
 		else

@@ -15,7 +15,7 @@
 #include "DataSystem.h"
 #include "MyCharacter.generated.h"
 
-const static int32 experience_table[20] = { 0,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900 };
+const static int32 experience_table[20] = { 10,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900 };
 
 UCLASS()
 class STARDEWVALLEY_API AMyCharacter : public ACharacter
@@ -35,6 +35,13 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	int32 CharacterPosZ;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	int32 Hero_Level;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	float Player_Exp;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	int32 Player_MaxExp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,11 +53,25 @@ protected:
 	class UCameraComponent* CameraComponent;
 
 private:
+	void UpdateCharacterRotation();
+
 	//Move in Y direction
 	void MoveY(float Value);
+	int32 MoveYFlag;
+	void SetMoveYFlag1();
+	void SetMoveYFlag2();
+	void ResetMoveYFlag();
 
 	//Move in X direction
 	void MoveX(float Value);
+	int32 MoveXFlag;
+	void SetMoveXFlag1();
+	void SetMoveXFlag2();
+	void ResetMoveXFlag();
+
+	FVector Direction;
+	FRotator CharacterRotation;
+	FRotator SpringRotation;
 
 	//Move in Up direction
 	void MoveUp(float Value);

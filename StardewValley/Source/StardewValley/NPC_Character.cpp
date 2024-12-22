@@ -51,6 +51,5 @@ void ANPC_Character::MoveBackward()
 }
 
 void ANPC_Character::SetMoveDirection() {
-	UE_LOG(LogTemp, Warning, TEXT("NPC Is Turning"));
 	bIsTimeToWalkForward = !bIsTimeToWalkForward;
 }
