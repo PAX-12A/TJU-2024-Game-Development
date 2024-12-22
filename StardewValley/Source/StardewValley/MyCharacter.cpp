@@ -317,26 +317,41 @@ void AMyCharacter::MouseClick() {
 void AMyCharacter::CharacterToolsUse(FVector Location) {
 	UE_LOG(LogTemp, Warning, TEXT("Hit Location: %f, %f, %f"), Location.X, Location.Y, Location.Z);
 	UE_LOG(LogTemp, Warning, TEXT("CharacterUseTools"));
+	UE_LOG(LogTemp, Warning, TEXT("Now Shortcut: %d"), now_shortcut_);
 
-	int32 now_item_id = now_shortcut_;//now_item_id is the exact type of the tool
-	//now_shortcut_ = GetGameInstance()->GetSubsystem<UDataSystem>()->get_tools_id(now_shortcut_);
-	float now_item_range = 200.0f;
-	//now_item_range = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_tool_range(now_item_id);
-	float skill_add_range = 100.0f;
-	//skill_add_range = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_skill_add_range(now_item_id);
+	//now_item_id is the exact type of the tool
+	int32 now_item_id = GetGameInstance()->GetSubsystem<UDataSystem>()->getShortBar(now_shortcut_);
+	UE_LOG(LogTemp, Warning, TEXT("Now Item Id: %d"), now_item_id);
+	if (now_item_id == 0) {
+		UE_LOG(LogTemp, Warning, TEXT("Shortcut Now Is Empty"));
+		return;
+	}
+	FStruct_ItemBase* item_info = item_data_table->FindRow<FStruct_ItemBase>(FName(*FString::FromInt(now_item_id)), "");
+
+	float now_item_range = item_info->use_area;
+
+	float skill_add_range = 0.0f;
+	if(now_item_id == 20||now_item_id == 24)
+		skill_add_range = axe_range_;
+	if (now_item_id == 21 || now_item_id == 25)
+		skill_add_range = hoe_range_;
+	if (now_item_id == 22 || now_item_id == 26)
+		skill_add_range = scythe_range_;
 	float permit_range = now_item_range + skill_add_range;
+
 	float distance = sqrt(pow(Location.X - CharacterLocation.X, 2) + pow(Location.Y - CharacterLocation.Y, 2));
+
 	UE_LOG(LogTemp, Warning, TEXT("Permit Range: %f"), permit_range);
 	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distance);
+
 	if (permit_range - distance > KINDA_SMALL_NUMBER) {
-		//if (now_item_id == 1)//item is tool->scythe
-			GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.Broadcast(Location.X, Location.Y);
-		//if (now_item_id == 2)//tool is tool->hoe
+		if (now_item_id == 21 || now_item_id == 25)//item is tool->hoe
 			GetGameInstance()->GetSubsystem<UEventSystem>()->OnPloughingEarthGround.Broadcast(Location.X, Location.Y);
-		//if (now_item_id > 10)//item is an real deployable item
-			GetGameInstance()->GetSubsystem<UEventSystem>()->OnPlacingItem.Broadcast(now_item_id, Location.X, Location.Y);
-		//else//item is other tools
-			GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolsTowardsItemBlock.Broadcast(now_item_id, Location.X, Location.Y);
+
+		if (now_item_id == 22 || now_item_id == 26)//item is tool->scythe
+			GetGameInstance()->GetSubsystem<UEventSystem>()->OnMowingGrassGround.Broadcast(Location.X, Location.Y);
+
+		GetGameInstance()->GetSubsystem<UEventSystem>()->OnToolsTowardsItemBlock.Broadcast(now_item_id, Location.X, Location.Y);
 	}
 }
 
@@ -349,7 +364,8 @@ void AMyCharacter::UseSkill1() {
 	UE_LOG(LogTemp, Warning, TEXT("UsingSkill1"));
 	int32 axe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_axe_level();
 	bIsAxeCoolDown = true;
-	axe_range_ = axe_level * 50.f + default_axe_range_;
+	axe_range_ = axe_level * 50.f;
+	GetWorldTimerManager().SetTimer(AxeEndTimerHandle, this, &AMyCharacter::AxeSkillEnd, axe_duration);
 	GetWorldTimerManager().SetTimer(AxeTimerHandle, this, &AMyCharacter::AxeEndCoolDown, axe_cool_down_duration);
 }
 
@@ -362,7 +378,8 @@ void AMyCharacter::UseSkill2() {
 	UE_LOG(LogTemp, Warning, TEXT("UsingSkill2"));
 	int32 hoe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_hoe_level();
 	bIsHoeCoolDown = true;
-	hoe_range_ = hoe_level * 50.f + default_hoe_range_;
+	hoe_range_ = hoe_level * 50.f;
+	GetWorldTimerManager().SetTimer(HoeEndTimerHandle, this, &AMyCharacter::HoeSkillEnd, hoe_duration);
 	GetWorldTimerManager().SetTimer(HoeTimerHandle, this, &AMyCharacter::HoeEndCoolDown, hoe_cool_down_duration);
 }
 
@@ -375,7 +392,8 @@ void AMyCharacter::UseSkill3() {
 	UE_LOG(LogTemp, Warning, TEXT("UsingSkill3"));
 	int32 scythe_level = GetGameInstance()->GetSubsystem<UDataSystem>()->get_player_scythe_level();
 	bIsScytheCoolDown = true;
-	scythe_range_ = scythe_level * 50.f + default_scythe_range_;
+	scythe_range_ = scythe_level * 50.f;
+	GetWorldTimerManager().SetTimer(ScytheEndTimerHandle, this, &AMyCharacter::ScytheSkillEnd, scythe_duration);
 	GetWorldTimerManager().SetTimer(ScytheTimerHandle, this, &AMyCharacter::ScytheEndCoolDown, scythe_cool_down_duration);
 }
 
@@ -391,21 +409,33 @@ void AMyCharacter::Skill3ExpUpdate() {
 	GetGameInstance()->GetSubsystem<UEventSystem>()->OnSkillExpUpdate.Broadcast(3, 20);
 }
 
+void AMyCharacter::AxeSkillEnd() {
+	UE_LOG(LogTemp, Warning, TEXT("Skill1End"));
+	axe_range_ = 0.f;
+}
+
+void AMyCharacter::HoeSkillEnd() {
+	UE_LOG(LogTemp, Warning, TEXT("Skill2End"));
+	hoe_range_ = 0.f;
+}
+
+void AMyCharacter::ScytheSkillEnd() {
+	UE_LOG(LogTemp, Warning, TEXT("Skill2End"));
+	scythe_range_ = 0.f;
+}
+
 void AMyCharacter::AxeEndCoolDown() {
 	bIsAxeCoolDown = false;
-	axe_range_ = default_axe_range_;
 	GetWorldTimerManager().ClearTimer(AxeTimerHandle);
 }
 
 void AMyCharacter::HoeEndCoolDown() {
 	bIsHoeCoolDown = false;
-	hoe_range_ = default_hoe_range_;
 	GetWorldTimerManager().ClearTimer(HoeTimerHandle);
 }
 
 void AMyCharacter::ScytheEndCoolDown() {
 	bIsScytheCoolDown = false;
-	scythe_range_ = default_scythe_range_;
 	GetWorldTimerManager().ClearTimer(ScytheTimerHandle);
 }
 
